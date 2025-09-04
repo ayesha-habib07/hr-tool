@@ -1,0 +1,45 @@
+{
+    "sidebarItems":[
+        {
+            "name":"Dashboard",
+            "href":"/",
+            "icon":"House"
+        },
+        {
+            "name":"Employees",
+            "href": "/employees",
+            "icon":"Users"
+        },
+        {
+            "name":"Projects",
+            "href": "/projects",
+            "icon":"CalendarCog"
+        },
+        {
+            "name":"Tasks",
+            "href": "/tasks",
+            "icon":"CalendarCheck2"
+        },
+        {
+            "name":"Team Members",
+            "href": "/team-members",
+            "icon":"UsersRound"
+        },
+        {
+            "name":"Attendence",
+            "href": "/attendance",
+            "icon":"CalendarClock"
+        },
+        {
+            "name":"Reports",
+            "href": "/reports",
+            "icon":"Proportions"
+        },
+        {
+            "name":"Setting",
+            "href": "/setting",
+            "icon":"Settings"
+        }
+        
+    ]
+}
