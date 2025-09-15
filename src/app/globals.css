@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* 🔹 DataTable container (entries + pagination) */
+.dataTable-bottom {
+  @apply flex flex-wrap items-center justify-between mt-4 text-sm text-gray-300;
+}
+
+/* 🔹 "Showing X to Y of Z entries" */
+.dataTable-info {
+  @apply text-gray-400 text-xs;
+}
+
+/* 🔹 Pagination wrapper */
+.dataTable-pagination {
+  @apply flex gap-2;
+}
+
+/* 🔹 Individual pagination buttons */
+.dataTable-pagination li a {
+  @apply px-3 py-1 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-blue-600 hover:text-white transition;
+}
+
+/* 🔹 Active page button */
+.dataTable-pagination li.active a {
+  @apply bg-blue-600 text-white border-blue-500;
+}
+
+/* 🔹 Disabled buttons */
+.dataTable-pagination li.disabled a {
+  @apply opacity-50 cursor-not-allowed;
+}

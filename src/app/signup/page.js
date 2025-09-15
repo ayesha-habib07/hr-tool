@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", organizationName: ""});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const router = useRouter(); 
+  const [message, setMessage] = useState(null);
+  const [role, setRole] = useState("");
+  const [roles, setRoles] = useState([]);
+  const router = useRouter();
+
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,7 +20,7 @@ export default function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage(null);
 
     try {
       const res = await fetch("/api/auth/signup", {
@@ -27,18 +31,17 @@ export default function SignupPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage(" Account created successfully!");
-        setForm({ name: "", email: "", password: "" });
+        setMessage({ text: "Account created successfully!", type: "success" });
+        setForm({ name: "", email: "", password: "", organizationName: ""});
 
-        // Redirect to dashboard after 1 second
         setTimeout(() => {
-          router.push("/organization");
+          router.push("/dashboard");
         }, 1000);
       } else {
-        setMessage(data.error || "Something went wrong");
+        setMessage({ text: data.error || "Something went wrong", type: "error" });
       }
     } catch (err) {
-      setMessage("Server error");
+      setMessage({ text: "Server error", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -53,11 +56,10 @@ export default function SignupPage() {
 
         {message && (
           <p
-            className={`mb-4 text-sm text-center ${
-              message.startsWith("✅") ? "text-green-600" : "text-red-500"
-            }`}
+            className={`mb-4 text-sm text-center ${message.type === "success" ? "text-green-600" : "text-red-500"
+              }`}
           >
-            {message}
+            {message.text}
           </p>
         )}
 
@@ -76,6 +78,8 @@ export default function SignupPage() {
               placeholder="John Doe"
             />
           </div>
+          
+          
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -107,6 +111,18 @@ export default function SignupPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Organization Name</label>
+            <input
+              type="text"
+              name="organizationName"
+              value={form.organizationName}
+              onChange={handleChange}
+              required
+              className="mt-1 w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              placeholder="Your Company / Organization"
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}

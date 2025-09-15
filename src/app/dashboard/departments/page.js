@@ -1,16 +1,16 @@
 import Link from "next/link";
-export default function Projects(){
+export default function Departments(){
     return(
         <>
             <div className="flex justify-between">
             
-                    <h2 className="text-white">Project Management</h2>
+                    <h2 className="text-white">Department Management</h2>
                     
                     <Link
-                      href="/addProject"
+                      href="/addDepartment"
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
                     >
-                      + Add Project
+                      + Add Department
                     </Link>
                   </div>
         </>
