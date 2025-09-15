@@ -3,13 +3,15 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, default: "user" },
+    email: { type: String, required: true, unique: true, lowercase:true },
+    password: { type: String, default: null },
+    organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", required: true },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
+   
   },
   { timestamps: true }
 );
 
-// Prevent model overwrite in dev mode
+
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;

@@ -4,6 +4,7 @@
             "name":"Dashboard",
             "href":"/",
             "icon":"House"
+            
         },
         {
             "name":"Employees",
@@ -14,16 +15,19 @@
             "name":"Projects",
             "href": "/projects",
             "icon":"CalendarCog"
+            
         },
         {
             "name":"Tasks",
             "href": "/tasks",
             "icon":"CalendarCheck2"
+            
         },
         {
             "name":"Team Members",
             "href": "/team-members",
             "icon":"UsersRound"
+           
         },
         {
             "name":"Attendence",
