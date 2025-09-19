@@ -6,19 +6,23 @@ import * as Icons from "lucide-react";
 import { useState, useEffect } from "react";
 
 const Sidebar = ({ userRole }) => {
-  // console.log(userRole);
+  console.log(userRole, "userRole");
 
   const [items, setItems] = useState([]);
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!userRole) return;
+    // if (!userRole) return;
 
     const fetchPermissions = async () => {
       try {
-        const res = await fetch(`/api/permissions?role=${encodeURIComponent(userRole)}`);
+        const res = await fetch(`/api/permissions?role=${encodeURIComponent(userRole?.role)}`);
         if (!res.ok) throw new Error("Failed to fetch permissions");
         const data = await res.json();
+
+
+        console.log(data , "apidata")
+        
         setItems(data);
       } catch (err) {
         console.error(err);
@@ -26,13 +30,15 @@ const Sidebar = ({ userRole }) => {
     };
 
     fetchPermissions();
-  }, [userRole]);
+  }, []);
 
   const segments = pathname.split("/").filter(Boolean);
   const activeSegment = segments[1] || "dashboard";
 
+  {console.log(items , "itemsitems")}
+
   return (
-    <aside className="bg-[#1e1e1e] border-r border-[#2a2a2a] flex flex-col w-16 md:w-64 transition-all duration-300">
+    <aside className="bg-[#1e1e1e] border-r  border-[#2a2a2a] flex flex-col w-16 md:w-64 transition-all duration-300">
       <div className="px-6 py-4 text-xl font-bold text-white tracking-wide border-b border-[#2a2a2a] hidden md:block">
         HR Tool
       </div>

@@ -18,6 +18,24 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
   const [editExp, setEditExp] = useState({ company: "", role: '', duration: '' })
 
 
+  // fetching deprtments from mongo
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await fetch("/api/departments");
+        const data = await res.json();
+        setDepartments(data);
+      } catch (err) {
+        console.error("Failed to load departments:", err);
+      }
+    };
+    fetchDepartments();
+  }, []);
+  
+
+
 
   const emptyProject = {
     name: '',
@@ -388,7 +406,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             jobInfo: {
               title: "",
               departmentId: "",
-              managerId: "",
+              managerId: "" || null,
               employmentType: "",
               status: "",
               dateOfJoining: "",
@@ -524,21 +542,37 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             onChange={(e) => handleChange("jobInfo", "title", e.target.value)}
             className="w-full p-2 border rounded"
           />
-          <input
+          {/* <input
             type="text"
             name="departmentId"
             placeholder="Department Id"
             value={formData.jobInfo.departmentId}
             onChange={(e) => handleChange("jobInfo", "departmentId", e.target.value)}
             className="w-full p-2 border rounded"
-          />
+          /> */}
+
+          <select
+          value={formData.jobInfo.departmentId}
+          onChange={(e) => handleChange("jobInfo","departmentId", e.target.value)}
+          className="w-full p-2 border rounded"
+          >
+            <option value=""> -- select department </option>
+            {
+              departments.map((dept)=>(
+                <option key={dept._id} value={dept._id}>
+                  {dept.name}
+                </option>
+              ))
+            }
+
+          </select>
         </div>
         <div className="flex gap-2">
           <input
             type="text"
             name="managerId"
             placeholder="Manager Id"
-            value={formData.jobInfo.managerId}
+            value={formData.jobInfo.managerId || ""}
             onChange={(e) => handleChange("jobInfo", "managerId", e.target.value)}
             className="w-full p-2 border rounded"
           />

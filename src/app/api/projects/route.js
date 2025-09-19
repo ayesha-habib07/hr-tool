@@ -2,12 +2,50 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../lib/connectDB";
 import Project from "../../../models/Projects";
 
-export async function GET() {
-  await connectDB();
-  const projects = await Project.find().sort({ createdAt: -1 });
-  return NextResponse.json(projects);
+// ================= GET Projects with Pagination & Search =================
+export async function GET(req) {
+  try {
+    await connectDB();
+
+    // query params
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { client: { $regex: search, $options: "i" } },
+            { type: { $regex: search, $options: "i" } },
+            { status: { $regex: search, $options: "i" } },
+            { priority: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const total = await Project.countDocuments(query);
+    const projects = await Project.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return NextResponse.json({
+      projects,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        page,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Error fetching projects:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
+// ================= POST Create Project =================
 export async function POST(req) {
   try {
     await connectDB();
@@ -38,14 +76,36 @@ export async function POST(req) {
       endDate,
       status,
       priority,
-      managerId: "dummy-manager-id", 
+      managerId: "dummy-manager-id",
       team: [],
       documents: [],
     });
 
     return NextResponse.json(project, { status: 201 });
   } catch (err) {
-    console.error(" Error creating project:", err);
+    console.error("❌ Error creating project:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+// ================= DELETE Project =================
+export async function DELETE(req) {
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "Project ID required" }, { status: 400 });
+    }
+
+    await Project.findByIdAndDelete(id);
+
+    return NextResponse.json({ message: "Project deleted successfully" });
+  } catch (err) {
+    console.error("❌ Error deleting project:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+

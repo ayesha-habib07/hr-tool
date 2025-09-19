@@ -22,13 +22,19 @@ export default function EmployeesPage() {
   }, [search]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(
-      `/api/employees?page=${page}&limit=${limit}&search=${debouncedSearch}`
-    );
-    const data = await res.json();
+    try {
 
-    setEmployees(data.employees || []);
-    setPagination(data.pagination || { total: 0, pages: 1, page: 1 });
+      const res = await fetch(
+        `/api/employees?page=${page}&limit=${limit}&search=${debouncedSearch}`
+      );
+      const data = await res.json();
+      console.log(data, "employeedata")
+
+      setEmployees(data.employees || []);
+      setPagination(data.pagination || { total: 0, pages: 1, page: 1 });
+    } catch (err) {
+      console.error("error fetching employees:", err)
+    }
   };
 
   useEffect(() => {
@@ -36,6 +42,7 @@ export default function EmployeesPage() {
   }, [page, debouncedSearch]);
 
   console.log("search:", search, "debounced:", debouncedSearch);
+  console.log(employees, "employyye")
 
   return (
     <div>

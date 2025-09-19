@@ -3,26 +3,6 @@ import { connectDB } from "../../../../lib/connectDB";
 import Employee from "../../../../models/Employee";
 
 import bcrypt from "bcryptjs";
-// export async function PUT(req, { params }) {
-//   try {
-//     await connectDB();
-//     const body = await req.json();
-//     const updated = await User.findByIdAndUpdate(params.id, body, { new: true });
-//     return NextResponse.json(updated);
-//   } catch (err) {
-//     return NextResponse.json({ error: err.message }, { status: 500 });
-//   }
-// }
-
-// export async function DELETE(req, { params }) {
-//   try {
-//     await connectDB();
-//     await User.findByIdAndDelete(params.id);
-//     return NextResponse.json({ message: "Deleted" });
-//   } catch (err) {
-//     return NextResponse.json({ error: err.message }, { status: 500 });
-//   }
-// }
 
 
 
@@ -46,24 +26,6 @@ export async function GET(req, { params }) {
 
 
 
-// src/app/api/employees/[id]/route.js - PUT
-// export async function PUT(req, { params }) {
-//   await connectDB();
-//   const { id } = params;
-//   const body = await req.json();
-
-//  // If password is provided → hash & update
-//   if (body.personalInfo?.password) {
-//     body.personalInfo.password = await bcrypt.hash(body.personalInfo.password, 10);
-//   } else {
-//     // If empty → don't override the old password
-//     delete body.personalInfo.password;
-//   }
-
-//   const updated = await Employee.findByIdAndUpdate(id, body, { new: true });
-//   return NextResponse.json(updated);
-// }
-
 
 export async function PUT(req, { params }) {
   try {
@@ -80,7 +42,7 @@ export async function PUT(req, { params }) {
     } else if (body.personalInfo) {
       delete body.personalInfo.password;
     }
-
+console.log("test api",req.json())
     const updated = await Employee.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

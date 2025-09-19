@@ -12,8 +12,14 @@ const employeeSchema = new mongoose.Schema({
 
   jobInfo: {
     title: { type: String },
-    departmentId: { type: mongoose.Schema.Types.ObjectId, ref:"Departments"},
-    managerId: {type:mongoose.Schema.Types.ObjectId, ref:"Employee" },
+    departmentId: { type: mongoose.Schema.Types.ObjectId, ref:"department" , required:true},
+    // managerId: {type:mongoose.Schema.Types.ObjectId, ref:"Employee", default:null },
+    managerId: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Employee", 
+      default: null, 
+      required: false 
+    },
     employmentType: { type: String },
     status: { type: String },
     dateOfJoining: { type: Date },

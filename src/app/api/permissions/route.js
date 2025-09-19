@@ -14,10 +14,15 @@ export async function GET(req) {
       return new Response(JSON.stringify({ error: "Role is required" }), { status: 400 });
     }
 
+    console.log(role)
+
     const rolePermissions = await Permission.findOne({ role });
+
+    console.log(rolePermissions?.permissions , "rolePermissions?.permissions")
     return new Response(JSON.stringify(rolePermissions?.permissions || []), {
       status: 200,
     });
+    
   } catch (err) {
     console.error(err);
     return new Response(JSON.stringify({ error: "Failed to fetch permissions" }), { status: 500 });
