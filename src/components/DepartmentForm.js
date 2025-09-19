@@ -3,6 +3,7 @@ import { useState } from "react"
 export default function DepartmentForm() {
     const [name, setName]= useState('');
     const[description, setDescription] = useState('');
+    // const [code, setCode] = useState('');
     const [loading, setLoading] = useState('');
     const[ error, setError] = useState('');
 
@@ -24,6 +25,7 @@ export default function DepartmentForm() {
              
             setName('');
             setDescription('');
+            
             alert('Department created successfully!')
 
         }
@@ -52,6 +54,15 @@ export default function DepartmentForm() {
             required
             className="border px-2 py-1 w-full"
              />
+             {/* <input
+             name="code"
+             value={code}
+             placeholder="Enter Code for Department"
+             onChange={(e)=> setCode(e.target.value)}
+             required
+             className="border px-2 py-1 w-full"
+                
+             /> */}
              <textarea
                 name="description"
                 value={description}

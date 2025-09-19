@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout({ children, showHeader = true  }) {
   const [user, setUser] = useState(null);
   const router = useRouter();
+  // const pathname = usePathname();
+  //   // hide header for /pages routes
+  // const hideHeader = pathname?.startsWith("/pages");
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -31,7 +35,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* sidebar */}
-      <Sidebar userRole={user.role?.name || user.role || "Admin"} />
+      <Sidebar userRole={user.role?.name || user.role || "Admin"}  />
 
       {/* main content */}
       <div className="flex flex-col flex-1 overflow-auto bg-[#111]">

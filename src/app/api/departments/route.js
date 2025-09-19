@@ -9,11 +9,11 @@ export async function GET() {
   return NextResponse.json(departments);
 }
 
-// POST create department
+
 export async function POST(req) {
   await connectDB();
   const body = await req.json();
-  const { name, description } = body;
+  const { name, description,  managerId } = body;
 
   if (!name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -23,6 +23,10 @@ export async function POST(req) {
   if (existing) {
     return NextResponse.json({ error: "Department already exists" }, { status: 409 });
   }
+  // const existingCode = await Department.findOne({ code });
+  // if (existingCode) {
+  //   return NextResponse.json({ error: "Code is already taken" }, { status: 407 });
+  // }
 
   const count = await Department.countDocuments();
   const departmentId = `DEP${String(count + 1).padStart(3, "0")}`;
@@ -31,8 +35,9 @@ export async function POST(req) {
     departmentId,
     name,
     description,
-    managerId: null, // dummy for now
+    managerId: managerId || null,
   });
+  console.log(department)
 
   return NextResponse.json(department, { status: 201 });
 }
