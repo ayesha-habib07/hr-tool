@@ -4,6 +4,11 @@
         {
             departmentId:{type:String},
             name:{type:String, required:true},
+            // code:{
+            //     type:Number,
+            //     unique:true,
+            //     required:true,
+            // },
             description:{type:String},
             managerId:{type:mongoose.Schema.Types.ObjectId, ref:"Employee"},
             createdAt:{type:Date},
@@ -11,5 +16,5 @@
         },
         {timestamps:true}
     );
-    const Department = mongoose.models.department || mongoose.model("department", departmentSchema);
+    const Department = mongoose.models.Department || mongoose.model("Department", departmentSchema);
     export default Department;

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import EmployeeForm from '../../components/EmployeeForm'
+import EmployeeForm from '../../../../components/EmployeeForm'
 
 export default function AddEmployeePage() {
   const searchParams = useSearchParams();

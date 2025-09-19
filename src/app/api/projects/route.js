@@ -53,7 +53,7 @@ export async function POST(req) {
     const body = await req.json();
     console.log("📩 Incoming project data:", body);
 
-    const { name, description, client, type, startDate, endDate, status, priority } = body;
+    const { name, description, client, type, startDate, endDate, status, priority, managerId } = body;
 
     if (!name || !type) {
       return NextResponse.json(
@@ -76,7 +76,7 @@ export async function POST(req) {
       endDate,
       status,
       priority,
-      managerId: "dummy-manager-id",
+      managerId,
       team: [],
       documents: [],
     });

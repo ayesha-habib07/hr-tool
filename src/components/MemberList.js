@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function MembersList({ employees, search, setSearch, onChange }) {
   const handleDelete = async (id) => {
     await fetch(`/api/employees?id=${id}`, { method: "DELETE" });
-    onChange(); 
+    onChange();
   };
 
   const handleSearch = (e) => {
@@ -29,7 +29,7 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
 
   return (
     <div className="mt-8">
-      
+
       <div className="flex justify-end mb-4">
         <input
           type="text"
@@ -40,7 +40,7 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
         />
       </div>
 
-    
+
       <div className="overflow-x-auto rounded-lg shadow-lg">
         <table className="min-w-full border border-gray-700 divide-y divide-gray-600 bg-gray-900 text-sm text-white">
           <thead className="bg-gray-800 text-gray-300 uppercase text-xs">
@@ -53,6 +53,7 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
               <th className="px-4 py-3 text-left">Title</th>
               <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3 text-left">Location</th>
+              <th className="px-4 py-3 text-left">Department</th>
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -67,20 +68,27 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
                 <td className="px-2 py-2">{emp.jobInfo?.title}</td>
                 <td className="px-2 py-2">{emp.jobInfo?.status}</td>
                 <td className="px-2 py-2">{emp.jobInfo?.location}</td>
-               <td className="px-2 py-2 text-center space-x-2">
-  <Link
-  href={`/addEmployee?id=${emp._id}`}  // passing employee to parent
-    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-xs"
-  >
-    Update
-  </Link>
-  <button
-    onClick={() => handleDelete(emp._id)}
-    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs"
-  >
-    Delete
-  </button>
-</td>
+                <td className="px-2 py-2">{emp.departmentName || "N/A"}</td>
+                {/* <td className="px-2 py-2">{emp.jobInfo?.departmentId?.name || N/A}</td>
+                 */}
+                {/* <td>
+  {emp.jobInfo?.departmentId?.name || "N/A"} 
+ 
+</td> */}
+                <td className="px-2 py-2 text-center space-x-2">
+                  <Link
+                    href={`/dashboard/employees/addEmployee?id=${emp._id}`}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-xs"
+                  >
+                    Update
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(emp._id)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
 

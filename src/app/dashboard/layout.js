@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout({ children, showHeader = true  }) {
   const [user, setUser] = useState(null);
   const router = useRouter();
+  // const pathname = usePathname();
+  //   // hide header for /pages routes
+  // const hideHeader = pathname?.startsWith("/pages");
+
 
   
 

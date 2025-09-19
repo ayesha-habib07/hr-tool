@@ -12,16 +12,10 @@ const employeeSchema = new mongoose.Schema({
 
   jobInfo: {
     title: { type: String },
-    departmentId: { type: mongoose.Schema.Types.ObjectId, ref:"department" , required:true},
-    // managerId: {type:mongoose.Schema.Types.ObjectId, ref:"Employee", default:null },
-    managerId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Employee", 
-      default: null, 
-      required: false 
-    },
+    departmentId: { type:mongoose.Schema.Types.ObjectId, ref:"Department", required:true},
+    managerId: {type:mongoose.Schema.Types.ObjectId, ref:"Employee", default:null },
     employmentType: { type: String },
-    status: { type: String },
+    status: { type: String }, 
     dateOfJoining: { type: Date },
     location: { type: String },
     skills: [{ type: String }],
@@ -62,7 +56,6 @@ const employeeSchema = new mongoose.Schema({
   },
 });
 
-const Employee =
-  mongoose.models.Employee || mongoose.model("Employee", employeeSchema);
+const Employee = mongoose.models.Employee || mongoose.model("Employee", employeeSchema);
 
 export default Employee;

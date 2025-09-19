@@ -6,6 +6,7 @@
             
 //                     <h2 className="text-white">Project Management</h2>
                     
+// <<<<<<< project
 //                     <Link
 //                       href="/addProject"
 //                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
@@ -100,3 +101,15 @@ export default function ProjectsPage() {
     </div>
   );
 }
+// =======
+//                     <Link
+//                       href="/dashboard/projects/addProject"
+//                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+//                     >
+//                       + Add Project
+//                     </Link>
+//                   </div>
+//         </>
+//     )
+// }
+// >>>>>>> main
