@@ -18,6 +18,24 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
   const [editExp, setEditExp] = useState({ company: "", role: '', duration: '' })
 
 
+  // fetching deprtments from mongo
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await fetch("/api/departments");
+        const data = await res.json();
+        setDepartments(data);
+      } catch (err) {
+        console.error("Failed to load departments:", err);
+      }
+    };
+    fetchDepartments();
+  }, []);
+  
+
+
 
   // fetching deprtments from mongo
   const [departments, setDepartments] = useState([]);
@@ -541,6 +559,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             onChange={(e) => handleChange("jobInfo", "title", e.target.value)}
             className="w-full p-2 border rounded"
           />
+
           <select
             value={formData.jobInfo.departmentId}
             onChange={(e) => handleChange("jobInfo", "departmentId",e.target.value)}

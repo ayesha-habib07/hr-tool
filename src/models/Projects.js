@@ -12,9 +12,13 @@ const projectSchema = new mongoose.Schema(
     status: { type: String, enum: ["planned", "inprogress", "onhold", "completed"] },
     priority: { type: String, enum: ["low", "medium", "high", "critical"] },
     managerId: { type: String }, 
+     
+    
     team: [
       {
+       
         employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
+        
         role: { type: String },
         assignedDate: { type: Date },
         endDate: { type: Date },

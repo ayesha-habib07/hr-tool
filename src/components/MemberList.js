@@ -25,6 +25,8 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
     );
   });
 
+  console.log(employees,"emppp")
+
   return (
     <div className="mt-8">
 

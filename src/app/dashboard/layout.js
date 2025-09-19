@@ -13,6 +13,8 @@ export default function DashboardLayout({ children, showHeader = true  }) {
   // const hideHeader = pathname?.startsWith("/pages");
 
 
+  
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -22,6 +24,8 @@ export default function DashboardLayout({ children, showHeader = true  }) {
           return;
         }
         const data = await res.json();
+
+        console.log(data , "data")
         setUser(data.user);
       } catch (err) {
         router.push("/login");
@@ -30,12 +34,15 @@ export default function DashboardLayout({ children, showHeader = true  }) {
     fetchUser();
   }, []);
 
+  console.log(user , "user")
   if (!user) return <p className="text-white">Loading...</p>;
 
   return (
     <div className="flex h-screen overflow-hidden">
       {/* sidebar */}
-      <Sidebar userRole={user.role?.name || user.role || "Admin"}  />
+
+      {console.log(user , "items")}
+      <Sidebar userRole={user} />
 
       {/* main content */}
       <div className="flex flex-col flex-1 overflow-auto bg-[#111]">

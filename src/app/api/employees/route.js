@@ -92,28 +92,127 @@ export async function GET(req) {
 }
 
 
+// export async function POST(req) {
+//   try {
+//     await connectDB();
+//     const body = await req.json();
+//     console.log("Incoming body:", body);
+    
+
+
+//     let hashedPassword = null;
+//     if (body?.personalInfo?.password) {
+//       hashedPassword = await bcrypt.hash(body.personalInfo.password, 10);
+//     }
+
+
+//     // first validation of required fields
+//     if (!body.personalInfo.firstName || !body.personalInfo.lastName || !body.personalInfo.email) {
+//       return NextResponse.json(
+//         { error: "Missing required personal information" },
+//         { status: 400 }
+//       );
+//     }
+//     const { user, error, status } = checkAuthAndRole(req, ['Admin']);
+//     if (error) {
+//       return NextResponse.json({ error }, { status });
+//     }
+//     let data = body;
+    
+//     if(data.jobinfo){
+//       if(data.jobinfo.mangerId === ''){
+//         data.jobInfo.mangerId = null;
+//       }
+//     }
+// console.log("data.jobinfo" )
+
+//     const newEmployee = await Employee.create({
+//       personalInfo: {
+//         firstName: body.personalInfo.firstName,
+//         lastName: body.personalInfo.lastName,
+//         email: body.personalInfo.email.trim().toLowerCase(),
+//         contactNumber: body.personalInfo.contactNumber,
+//         password: hashedPassword,
+//       },
+//       jobInfo: {
+//         title: body.jobInfo?.title,
+//         departmentId: body.jobInfo?.departmentId,
+//         managerId: body.jobInfo?.managerId || null,
+//         employmentType: body.jobInfo?.employmentType,
+//         status: body.jobInfo?.status,
+//         dateOfJoining: body.jobInfo?.dateOfJoining,
+//         location: body.jobInfo?.location,
+//         skills: body.jobInfo?.skills || [],
+//         experiences: body.jobInfo?.experiences || [],
+//         pastProjects: body.jobInfo?.pastProjects || [],
+//       },
+//       currentProjects: body.currentProjects || [],
+//       systemInfo: {
+//     userId: user.id,  // ✅ comes from token
+//     role: user.role || "system",
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//     updatedBy: user.id || "system",
+//   },
+//     });
+//    const newUser= await newEmployee.save();
+
+//     return NextResponse.json(newUser, { status: 201 });
+//     console.log("Saving jobInfo.experiences:", body.jobInfo?.experiences);
+
+//   } catch (err) {
+//     console.error("POST /api/employees error:", err);
+//     return NextResponse.json({ error: err.message }, { status: 500 });
+//   }
+// }
+
 export async function POST(req) {
   try {
     await connectDB();
     const body = await req.json();
     console.log("Incoming body:", body);
 
-
-
+    // 🔑 Hash password if provided
     let hashedPassword = null;
     if (body?.personalInfo?.password) {
       hashedPassword = await bcrypt.hash(body.personalInfo.password, 10);
     }
 
-
-    // first validation of required fields
-    if (!body.personalInfo.firstName || !body.personalInfo.lastName || !body.personalInfo.email) {
+    // 🔑 Validate required personalInfo fields
+    if (
+      !body.personalInfo?.firstName ||
+      !body.personalInfo?.lastName ||
+      !body.personalInfo?.email
+    ) {
       return NextResponse.json(
         { error: "Missing required personal information" },
         { status: 400 }
       );
     }
-    const { user, error, status } = checkAuthAndRole(req, ['Admin']);
+
+    // 🔑 Validate departmentId (required in schema)
+    if (
+      !body.jobInfo?.departmentId ||
+      !mongoose.Types.ObjectId.isValid(body.jobInfo.departmentId)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or missing departmentId" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ managerId is optional (only validate if provided)
+    let managerId = null;
+    if (body.jobInfo?.managerId) {
+      if (mongoose.Types.ObjectId.isValid(body.jobInfo.managerId)) {
+        managerId = body.jobInfo.managerId;
+      } else {
+        console.warn("⚠️ Invalid managerId received, setting to null");
+      }
+    }
+
+    // 🔑 Role check
+    const { user, error, status } = checkAuthAndRole(req, ["Admin"]);
     if (error) {
       return NextResponse.json({ error }, { status });
     }
@@ -129,7 +228,7 @@ export async function POST(req) {
 // check this later
     // jobInfo.departmentId = new mongoose.Types.ObjectId(body.jobInfo.departmentId);
 
-
+    // ✅ Create employee
     const newEmployee = await Employee.create({
       personalInfo: {
         firstName: body.personalInfo.firstName,
@@ -140,8 +239,8 @@ export async function POST(req) {
       },
       jobInfo: {
         title: body.jobInfo?.title,
-        departmentId: body.jobInfo?.departmentId,
-        managerId: body.jobInfo?.managerId,
+        departmentId: body.jobInfo.departmentId,
+        managerId: managerId, // optional now
         employmentType: body.jobInfo?.employmentType,
         status: body.jobInfo?.status,
         dateOfJoining: body.jobInfo?.dateOfJoining,
@@ -159,11 +258,8 @@ export async function POST(req) {
         updatedBy: user.id || "system",
       },
     });
-    await newEmployee.save();
 
     return NextResponse.json(newEmployee, { status: 201 });
-    console.log("Saving jobInfo.experiences:", body.jobInfo?.experiences);
-
   } catch (err) {
     console.error("POST /api/employees error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
