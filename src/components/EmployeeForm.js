@@ -37,8 +37,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
 
 
 
-  // fetching deprtments from mongo
-  const [departments, setDepartments] = useState([]);
+
 
   useEffect(() => {
     const fetchDepartments = async () => {
