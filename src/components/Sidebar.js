@@ -43,6 +43,8 @@ const Sidebar = ({ userRole }) => {
 
           const hrefSegments = fullHref.split("/").filter(Boolean);
           const itemSegment = hrefSegments[1] || "dashboard";
+
+          console.log({ fullHref, itemSegment, activeSegment });
           const isActive = activeSegment === itemSegment;
 
           return (
@@ -69,3 +71,4 @@ const Sidebar = ({ userRole }) => {
 };
 
 export default Sidebar;
+

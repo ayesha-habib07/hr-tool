@@ -38,7 +38,7 @@ export async function POST(req) {
       endDate,
       status,
       priority,
-      managerId: "dummy-manager-id", 
+      managerId, 
       team: [],
       documents: [],
     });

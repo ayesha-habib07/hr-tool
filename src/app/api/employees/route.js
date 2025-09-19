@@ -2,28 +2,20 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../lib/connectDB";
 import Employee from '../../../models/Employee';
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken';
+import mongoose from "mongoose";
+import Department from "../../../models/Departments";
 
 import { checkAuthAndRole } from "../../../lib/auth";
-
-
-
-
-
-
-
-
 export async function GET(req) {
   try {
     await connectDB();
 
     const { searchParams } = new URL(req.url);
-
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const search = searchParams.get("search") || "";
 
-    // FIXED QUERY
+    // Build search query
     const query = search
       ? {
         $or: [
@@ -34,15 +26,55 @@ export async function GET(req) {
           { "jobInfo.title": { $regex: search, $options: "i" } },
           { "jobInfo.location": { $regex: search, $options: "i" } },
           { "systemInfo.role": { $regex: search, $options: "i" } },
+          { "jobInfo.departmentId": { $regex: search, $options: "i" } },
         ],
       }
       : {};
 
+    // Count total documents for pagination
     const total = await Employee.countDocuments(query);
-    const employees = await Employee.find(query)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
+
+    // Aggregate employees with department name
+    const employees = await Employee.aggregate([
+      { $match: query },
+
+      // Convert string departmentId to ObjectId
+      {
+        $addFields: {
+          departmentObjectId: { $toObjectId: "$jobInfo.departmentId" },
+        },
+      },
+
+      // Lookup department
+      {
+        $lookup: {
+          from: "departments",
+          localField: "jobInfo.departmentId",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+
+      { $unwind: { path: "$department", preserveNullAndEmptyArrays: true } },
+
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+
+      // Select fields to return
+      {
+        $project: {
+          "personalInfo.firstName": 1,
+          "personalInfo.lastName": 1,
+          "personalInfo.email": 1,
+          "personalInfo.contactNumber": 1,
+          "jobInfo.title": 1,
+          "jobInfo.status": 1,
+          "jobInfo.location": 1,
+          "systemInfo.role": 1,
+          departmentName: { $ifNull: ["$department.name", "N/A"] },
+        },
+      },
+    ]);
 
     return NextResponse.json({
       employees,
@@ -65,7 +97,7 @@ export async function POST(req) {
     await connectDB();
     const body = await req.json();
     console.log("Incoming body:", body);
-    
+
 
 
     let hashedPassword = null;
@@ -85,6 +117,17 @@ export async function POST(req) {
     if (error) {
       return NextResponse.json({ error }, { status });
     }
+    let data = body;
+    // sanitize empty strings to null
+    if (data.jobInfo) {
+      if (data.jobInfo.managerId === '') {
+        data.jobInfo.managerId = null;
+      }
+    }
+
+
+// check this later
+    // jobInfo.departmentId = new mongoose.Types.ObjectId(body.jobInfo.departmentId);
 
 
     const newEmployee = await Employee.create({
@@ -109,12 +152,12 @@ export async function POST(req) {
       },
       currentProjects: body.currentProjects || [],
       systemInfo: {
-    userId: user.id,  // ✅ comes from token
-    role: user.role || "system",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    updatedBy: user.id || "system",
-  },
+        userId: user.id,
+        role: user.role || "system",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        updatedBy: user.id || "system",
+      },
     });
     await newEmployee.save();
 
@@ -135,9 +178,9 @@ export async function PUT(req) {
     const body = await req.json();
 
     // authentication cokies
-    const {user, error, status} = checkAuthAndRole(req,['Admin']);
-    if(error){
-      return NextResponse.json({error}, {status});
+    const { user, error, status } = checkAuthAndRole(req, ['Admin']);
+    if (error) {
+      return NextResponse.json({ error }, { status });
     }
 
 
@@ -168,20 +211,20 @@ export async function PUT(req) {
       employee.currentProjects = { ...employee.currentProjects.toObject(), ...body.currentProjects };
     }
     if (body.systemInfo) {
-  employee.systemInfo = {
-    ...employee.systemInfo.toObject(),
-    updatedAt: new Date(),
-    updatedBy: user.id || "system",
-  };
+      employee.systemInfo = {
+        ...employee.systemInfo.toObject(),
+        updatedAt: new Date(),
+        updatedBy: user.id || "system",
+      };
 
-    await employee.save();
-    return NextResponse.json(employee, { status: 200 });
-    console.log("Saving jobInfo.experiences:", body.jobInfo?.experiences);
+      await employee.save();
+      return NextResponse.json(employee, { status: 200 });
+      console.log("Saving jobInfo.experiences:", body.jobInfo?.experiences);
+    }
+  } catch (err) {
+    console.error("PUT /api/employees error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-}catch (err) {
-  console.error("PUT /api/employees error:", err);
-  return NextResponse.json({ error: err.message }, { status: 500 });
-}
 }
 
 
@@ -207,44 +250,3 @@ export async function DELETE(req) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
-
-
-
-// export async function POST(req) {
-//   try {
-//     await connectDB();
-//     const body = await req.json();
-
-//     const newEmployee = new Employee({
-//       employeeId: body.employeeId,
-//       personalInfo: {
-//         firstName: body.firstName,
-//         lastName: body.lastName,
-//         email: body.email,
-//         contactNumber: body.contactNumber,
-//       },
-//       jobInfo: {
-//         title: body.title,
-//         employmentType: body.employmentType,
-//         status: body.status,
-//         dateOfJoining: body.dateOfJoining,
-//         location: body.location,
-//         skills: body.skills || [],
-//       },
-//     });
-
-//     await newEmployee.save();
-
-//     return NextResponse.json(
-//       { message: "Employee created successfully" },
-//       { status: 201 }
-//     );
-//   } catch (error) {
-//     console.error("Error creating employee:", error);
-//     return NextResponse.json(
-//       { message: "Failed to create employee", error },
-//       { status: 500 }
-//     );
-//   }
-// }

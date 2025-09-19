@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import EmployeeForm from "../../../components/EmployeeForm";
+import EmployeeForm from "../../../../../components/EmployeeForm";
 
 export default function EditEmployeePage() {
   const { id } = useParams();
