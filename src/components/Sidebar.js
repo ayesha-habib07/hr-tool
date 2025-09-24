@@ -21,8 +21,7 @@ const Sidebar = ({ userRole }) => {
         const data = await res.json();
 
 
-        console.log(data , "apidata")
-        
+        console.log(data, "apidata")
         setItems(data);
       } catch (err) {
         console.error(err);
@@ -35,11 +34,11 @@ const Sidebar = ({ userRole }) => {
   const segments = pathname.split("/").filter(Boolean);
   const activeSegment = segments[1] || "dashboard";
 
-  {console.log(items , "itemsitems")}
+  { console.log(items, "itemsitems") }
 
   return (
-    <aside className="bg-[#1e1e1e] border-r  border-[#2a2a2a] flex flex-col w-16 md:w-64 transition-all duration-300">
-      <div className="px-6 py-4 text-xl font-bold text-white tracking-wide border-b border-[#2a2a2a] hidden md:block">
+    <aside className="text-gray-400 p-4  flex flex-col w-16 md:w-64 transition-all duration-300">
+      <div className="px-6 py-4 text-xl font-bold text-secondary-dark800 tracking-wide hidden md:block">
         HR Tool
       </div>
       <nav className="flex-1 overflow-y-auto p-2 space-y-3">
@@ -57,8 +56,8 @@ const Sidebar = ({ userRole }) => {
             <Link
               key={item.name}
               href={fullHref}
-              className={`group flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative
-                ${isActive ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-[#2a2a2a] hover:text-white"}`}
+              className={`group flex items-center gap-3 px-4 py-4 rounded-lg transition-colors relative
+                ${isActive ? "bg-secondary-light50 text-secondary-dark800" : "text-grey-700 hover:bg-secondary-light50 hover:text-secondary-dark800"}`}
             >
               {Icon && <Icon className="w-5 h-5 shrink-0" />}
               <span className="font-medium hidden md:inline">{item.name}</span>

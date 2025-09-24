@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import table from '../../components/ui/table'
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -33,15 +34,16 @@ export default function DashboardPage() {
   if (loading) return <p className="text-white p-4">Loading dashboard...</p>;
   if (!user) return null;
 
-  
+
   const roleName = user.role?.name || user.role;
 
   return (
-    <div className="p-6 text-gray-100 space-y-6">
+    <div className="rounded-lg p-6 text-secondary-dark800 bg-primary-light50 space-y-6">
       <h2 className="text-2xl font-bold mb-6">
         Welcome, {user.name} ({roleName})
       </h2>
-
+      <table />
+      
 
     </div>
   );
