@@ -45,7 +45,7 @@ export default function DashboardLayout({ children, showHeader = true  }) {
       <Sidebar userRole={user} />
 
       {/* main content */}
-      <div className="flex flex-col flex-1 overflow-auto bg-[#111]">
+      <div className="flex flex-col flex-1 overflow-auto ">
         <Header user={user} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

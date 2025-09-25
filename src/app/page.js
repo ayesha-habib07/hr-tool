@@ -1,4 +1,5 @@
 'use client';
+import './globals.css'
 import Link from 'next/link';
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
        <div className="mt-6 flex gap-4">
        <Link href='/signup' className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Sign Up</Link>
       <Link href='/login' className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Login</Link>
+      
 
        </div>
     </div>

@@ -36,12 +36,12 @@ export default function AddEmployeePage() {
     })();
   }, [id]);
 
-  if (loading) return <p className="text-white">Loading employee...</p>;
+  if (loading) return <p className="text-secondary-dark800">Loading employee...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   // pass isEdit true only when we actually loaded initialData
   return (
-    <div className="min-h-screen flex items-start justify-center p-6">
+    <div className="bg-primary-light50 min-h-screen flex items-start justify-center p-6 rounded-lg">
       <EmployeeForm initialData={initialData} isEdit={Boolean(initialData)} />
     </div>
   );
