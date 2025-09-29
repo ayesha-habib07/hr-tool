@@ -8,16 +8,12 @@ export default function DepartmentForm({ mode = 'add', initialData = null, isEdi
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
 
-
-
     useEffect(() => {
         if (initialData) {
             setName(initialData.name || "");
             setDescription(initialData.description || "");
         }
     }, [initialData])
-
-
     async function handleSubmit(e) {
         e.preventDefault();
         setLoading(true);
@@ -25,8 +21,6 @@ export default function DepartmentForm({ mode = 'add', initialData = null, isEdi
         try {
             const url = isEdit ? `/api/departments/${initialData._id}` : "/api/departments"
             const method = isEdit ? 'PUT' : 'POST'
-
-
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
@@ -38,8 +32,6 @@ export default function DepartmentForm({ mode = 'add', initialData = null, isEdi
                 setMessage(data.error || 'error while saving department');
                 throw new Error(data.error || "Failed to save department");
             }
-
-
             setName('');
             setDescription('');
 
@@ -52,7 +44,6 @@ export default function DepartmentForm({ mode = 'add', initialData = null, isEdi
                 setName = ''
                 setDescription = ''
             }
-
         }
         catch (err) {
             setError(err.message);

@@ -117,7 +117,7 @@ export async function DELETE(req) {
 //     await connectDB();
 
 //     const body = await req.json();
-//     console.log("📩 Incoming project data:", body);
+//     console.log("Incoming project data:", body);
 
 //     const { name, description, client, type, startDate, endDate, status, priority, managerId } = body;
 

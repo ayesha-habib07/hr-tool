@@ -43,10 +43,6 @@ export default function AddDepartmentPage() {
         <>
             <div className="bg-primary-light50 flex w-[100%] min-h-screen  justify-center p-6 rounded-lg">
                 <DepartmentForm initialData={initialData} isEdit={Boolean(initialData)} />
-
-
-
-
             </div>
         </>
     )

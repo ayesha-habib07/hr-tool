@@ -178,7 +178,7 @@ export async function POST(req) {
       hashedPassword = await bcrypt.hash(body.personalInfo.password, 10);
     }
 
-    // 🔑 Validate required personalInfo fields
+    // Validate required personalInfo fields
     if (
       !body.personalInfo?.firstName ||
       !body.personalInfo?.lastName ||
@@ -190,7 +190,7 @@ export async function POST(req) {
       );
     }
 
-    // 🔑 Validate departmentId (required in schema)
+    // Validate departmentId (required in schema)
     if (
       !body.jobInfo?.departmentId ||
       !mongoose.Types.ObjectId.isValid(body.jobInfo.departmentId)
@@ -201,7 +201,7 @@ export async function POST(req) {
       );
     }
 
-    // ✅ managerId is optional (only validate if provided)
+    //  managerId is optional (only validate if provided)
     let managerId = null;
     if (body.jobInfo?.managerId) {
       if (mongoose.Types.ObjectId.isValid(body.jobInfo.managerId)) {

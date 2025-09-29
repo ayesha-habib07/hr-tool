@@ -120,18 +120,10 @@ import {
   TableCaption,
 
 } from "@/components/ui/table"
-
-
-
-
-// import UpdateIcon from '@mui/icons-material/Update';
-// import BorderColorIcon from '@mui/icons-material/BorderColor';
 import EditIcon from '@mui/icons-material/Edit';
 
 
 export default function MembersList({ employees, search, setSearch, onChange }) {
-
-
   const handleSearch = (e) => setSearch(e.target.value)
 
   const filteredEmployees = employees.filter((emp) => {
@@ -145,8 +137,7 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
       emp.jobInfo?.location?.toLowerCase().includes(text) ||
       emp.systemInfo?.role?.toLowerCase().includes(text)
     )
-  })
-
+  });
   return (
     <div className="mt-8">
       {/* Search */}

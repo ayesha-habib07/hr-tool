@@ -4,8 +4,6 @@ import { useSearchParams } from "next/navigation";
 
 import ProjectForm from "../../../../components/ProjectForm";
 
-
-
 export default function AddProjectPage() {
 
     const searchParams = useSearchParams();

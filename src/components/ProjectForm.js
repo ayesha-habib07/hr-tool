@@ -137,8 +137,6 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                         {message}
                     </p>
                 )}
-
-
                 <div className="relative flex-1">
                     <input
                         type='text'
@@ -416,13 +414,6 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                             Assign Employees
                         </label>
                     </div>
-
-
-
-
-
-
-
                 </div>
                 <button
                     type="submit"

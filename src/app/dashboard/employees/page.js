@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import MembersList from "../../../components/MemberList";
 import Link from "next/link";
 
-
-
 import { Button } from "@/components/ui/button"
 
 export default function EmployeesPage() {
@@ -54,13 +52,6 @@ export default function EmployeesPage() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between">
           <h2 className="text-secondary-dark800  text-xl font-medium">Employees Management</h2>
-
-          {/* <Link
-            href="/dashboard/employees/addEmployee"
-            className="bg-secondary-light50 text-secondary-dark800 hover:bg-secondary-light50 font-medium  rounded-lg shadow-md transition px-4 py-3"
-          >
-            + Add Employee
-          </Link> */}
           <Link href="/dashboard/employees/addEmployee">
             <Button className='bg-secondary-light50 text-secondary-dark800 hover:bg-secondary-light50 hover:text-secondary-dark800 cursor-pointer font-medium  rounded-lg shadow-md transition'> + Add Employee</Button>
           </Link>

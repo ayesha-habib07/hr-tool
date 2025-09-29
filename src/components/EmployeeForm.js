@@ -51,8 +51,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     fetchEmployees();
   }, []);
 
-
-
   // fetching deprtments from mongo
   const [departments, setDepartments] = useState([]);
 
@@ -86,8 +84,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
   const [projectEditIndex, setProjectEditIndex] = useState(-1);
   const [projectEditData, setProjectEditData] = useState(emptyProject);
   const [editProjectTechInput, setEditProjectTechInput] = useState('');
-
-
 
   const emptyCurrentProject = {
     projectId: '',
@@ -183,8 +179,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       updatedBy: "",
     }
   });
-
-
   // prefilled when editing form data
   useEffect(() => {
     if (!initialData) return;
@@ -306,8 +300,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     setNewExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
     setIsAddingExperience(false);
   };
-
-
 
   // Add a new past project
   const addProject = (proj) => {
@@ -473,7 +465,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       }
 
     }
-
 
     catch (error) {
       console.log(error);

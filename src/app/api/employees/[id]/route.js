@@ -24,9 +24,6 @@ export async function GET(req, { params }) {
   }
 }
 
-
-
-
 export async function PUT(req, { params }) {
   try {
     await connectDB();

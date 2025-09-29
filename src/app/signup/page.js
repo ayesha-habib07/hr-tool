@@ -12,8 +12,6 @@ export default function SignupPage() {
   const [roles, setRoles] = useState([]);
   const router = useRouter();
 
-
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -47,7 +45,6 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary-light50 px-4">
       <div className="w-full max-w-lg bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl p-8">
@@ -90,23 +87,6 @@ export default function SignupPage() {
             </label>
 
           </div>
-          {/* <div className="relative">
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-              placeholder=""
-            />
-            <label
-              htmlFor="email"
-              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-            >
-              Email Address / Username
-            </label>
-          </div> */}
-
           <div className="relative">
             <input
               type="email"
@@ -180,8 +160,6 @@ export default function SignupPage() {
             </a>
           </p>
         </form>
-
-
       </div>
     </div>
   );
