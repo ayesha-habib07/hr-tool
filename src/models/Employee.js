@@ -12,10 +12,10 @@ const employeeSchema = new mongoose.Schema({
 
   jobInfo: {
     title: { type: String },
-    departmentId: { type:mongoose.Schema.Types.ObjectId, ref:"Department", required:true},
-    managerId: {type:mongoose.Schema.Types.ObjectId, ref:"Employee", default:null },
+    departmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Department", required: true },
+    managerId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee", default: null },
     employmentType: { type: String },
-    status: { type: String }, 
+    status: { type: String },
     dateOfJoining: { type: Date },
     location: { type: String },
     skills: [{ type: String }],
@@ -24,7 +24,8 @@ const employeeSchema = new mongoose.Schema({
       {
         company: { type: String },
         role: { type: String },
-        duration: { type: String },
+        dateOfJoining: { type: String },
+        dateOfLeaving:{ type: String },
       },
     ],
 
@@ -33,7 +34,8 @@ const employeeSchema = new mongoose.Schema({
         name: { type: String },
         description: { type: String },
         technologies: [{ type: String }],
-        duration: { type: String },
+        projectStartDate: { type: String },
+        projectEndDate: { type: String },
         company: { type: String },
       },
     ],
@@ -41,7 +43,7 @@ const employeeSchema = new mongoose.Schema({
 
   currentProjects: [
     {
-      projectId: { type:String},
+      projectId: { type: String },
       role: { type: String },
       assignedDate: { type: Date },
     },
@@ -52,7 +54,7 @@ const employeeSchema = new mongoose.Schema({
     role: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    updatedBy: { type: String},
+    updatedBy: { type: String },
   },
 });
 

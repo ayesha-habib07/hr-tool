@@ -117,20 +117,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table"
+  TableCaption,
+
+} from "@/components/ui/table"
 
 
-import DeleteIcon from '@mui/icons-material/Delete';
+
+
 // import UpdateIcon from '@mui/icons-material/Update';
 // import BorderColorIcon from '@mui/icons-material/BorderColor';
 import EditIcon from '@mui/icons-material/Edit';
 
 
 export default function MembersList({ employees, search, setSearch, onChange }) {
-  const handleDelete = async (id) => {
-    await fetch(`/api/employees?id=${id}`, { method: "DELETE" })
-    onChange()
-  }
+
 
   const handleSearch = (e) => setSearch(e.target.value)
 
@@ -163,7 +163,7 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg">
         <Table>
-          {/* <TableCaption>Employees</TableCaption> */}
+          <TableCaption>A list of employees</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>First Name</TableHead>
@@ -178,35 +178,39 @@ export default function MembersList({ employees, search, setSearch, onChange }) 
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="text-grey-700">
             {filteredEmployees.map((emp) => (
               <TableRow key={emp._id}>
-                <TableCell>{emp.personalInfo?.firstName}</TableCell>
+                <TableCell>
+                  <Link
+                    className="cursor-pointer text-grey-700"
+                    href={`/dashboard/employees/${emp._id}`}
+                  >
+                    {emp.personalInfo?.firstName}
+                  </Link>
+                </TableCell>
                 <TableCell>{emp.personalInfo?.lastName}</TableCell>
-                <TableCell>{emp.personalInfo?.email}</TableCell>
+                <TableCell>
+                  <Link
+                    href={`/dashboard/employees/${emp._id}`}
+                  >
+                    {emp.personalInfo?.email}
+                  </Link>
+                </TableCell>
                 <TableCell>{emp.systemInfo?.role || "N/A"}</TableCell>
                 <TableCell>{emp.personalInfo?.contactNumber}</TableCell>
                 <TableCell>{emp.jobInfo?.title}</TableCell>
                 <TableCell>{emp.jobInfo?.status}</TableCell>
                 <TableCell>{emp.jobInfo?.location}</TableCell>
                 <TableCell>{emp.departmentName || "N/A"}</TableCell>
-                <TableCell className="text-center space-x-2">
-
-                  <div className="flex justify-center items-center gap-1">
-                    <Link
+                <TableCell className="space-x-2">
+                  <Link
                     href={`/dashboard/employees/addEmployee?id=${emp._id}`}
                     className="bg-primary-light50 hover:bg-primary-dark600 text-primary-dark600  hover:text-grey-50 px-2 py-1 rounded-md text-xs flex items-center justify-center transition-colors duration-300 ease-in-out"
                   >
-                    <EditIcon fontSize="small"/>
+                    <EditIcon fontSize="small" />
                   </Link>
 
-                  <button
-                    onClick={() => handleDelete(emp._id)}
-                    className="bg-secondary-light50 hover:bg-secondary-dark600 text-secondary-dark600  hover:text-grey-50 px-2 py-1 rounded-md text-xs flex items-center justify-center cursor-pointer transition-colors duration-300 ease-in-out"
-                  >
-                    <DeleteIcon fontSize="small"/>
-                  </button>
-                  </div>
                 </TableCell>
               </TableRow>
             ))}

@@ -228,7 +228,7 @@ export async function POST(req) {
 // check this later
     // jobInfo.departmentId = new mongoose.Types.ObjectId(body.jobInfo.departmentId);
 
-    // ✅ Create employee
+    // Create employee
     const newEmployee = await Employee.create({
       personalInfo: {
         firstName: body.personalInfo.firstName,

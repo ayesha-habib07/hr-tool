@@ -40,7 +40,7 @@ export async function GET(req) {
       },
     });
   } catch (err) {
-    console.error("❌ Error fetching projects:", err);
+    console.error(" Error fetching projects:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
@@ -51,7 +51,7 @@ export async function POST(req) {
     await connectDB();
 
     const body = await req.json();
-    console.log("📩 Incoming project data:", body);
+    console.log("Incoming project data:", body);
 
     const { name, description, client, type, startDate, endDate, status, priority, managerId } = body;
 
@@ -83,7 +83,7 @@ export async function POST(req) {
 
     return NextResponse.json(project, { status: 201 });
   } catch (err) {
-    console.error("❌ Error creating project:", err);
+    console.error(" Error creating project:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
@@ -104,8 +104,72 @@ export async function DELETE(req) {
 
     return NextResponse.json({ message: "Project deleted successfully" });
   } catch (err) {
-    console.error("❌ Error deleting project:", err);
+    console.error(" Error deleting project:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
+
+
+// // ================= POST Create Project =================
+// export async function POST(req) {
+//   try {
+//     await connectDB();
+
+//     const body = await req.json();
+//     console.log("📩 Incoming project data:", body);
+
+//     const { name, description, client, type, startDate, endDate, status, priority, managerId } = body;
+
+//     if (!name || !type) {
+//       return NextResponse.json(
+//         { error: "Name and Type are required." },
+//         { status: 400 }
+//       );
+//     }
+
+//     //  safer auto-generating project ID
+//     const lastProject = await Project.findOne().sort({ createdAt: -1 });
+//     let projectId = "PRJ001";
+
+//     if (lastProject && lastProject.projectId) {
+//       const lastNum = parseInt(lastProject.projectId.replace("PRJ", ""), 10);
+//       projectId = `PRJ${String(lastNum + 1).padStart(3, "0")}`;
+//     }
+
+//     const project = await Project.create({
+//       projectId,
+//       name,
+//       description,
+//       client,
+//       type,
+//       startDate,
+//       endDate,
+//       status,
+//       priority,
+//       managerId,
+//       team: [],
+//       documents: [],
+//     });
+
+//     return NextResponse.json(project, { status: 201 });
+//   } catch (err) {
+//     console.error("Error creating project:", err);
+
+//     // retry logic for duplicate projectId (rare race condition)
+//     if (err.code === 11000) {
+//       const lastProject = await Project.findOne().sort({ createdAt: -1 });
+//       const lastNum = parseInt(lastProject.projectId.replace("PRJ", ""), 10);
+//       const newId = `PRJ${String(lastNum + 1).padStart(3, "0")}`;
+
+//       try {
+//         const project = await Project.create({ ...(await req.json()), projectId: newId });
+//         return NextResponse.json(project, { status: 201 });
+//       } catch (retryErr) {
+//         return NextResponse.json({ error: retryErr.message }, { status: 500 });
+//       }
+//     }
+
+//     return NextResponse.json({ error: err.message }, { status: 500 });
+//   }
+// }

@@ -4,8 +4,6 @@ import { Eye, EyeOff, RefreshCcw, X } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 
-
-
 // shadcn component imports
 import {
   Dialog,
@@ -18,8 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 
-
-
 export default function EmployeeForm({ mode = "add", initialData = null, isEdit = false }) {
   const router = useRouter();
   const [message, setMessage] = useState('');
@@ -27,16 +23,34 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
   // setting fetched roles from Api into roles
   const [roles, setRoles] = useState([]);
 
-  // const [isAddingExperience, setIsAddingExperience] = useState(false);
-  // const [newExp, setNewExp] = useState({ company: "", role: "", duration: "" });
+
   const [isAddingExperience, setIsAddingExperience] = useState(false);
-  const [newExp, setNewExp] = useState({ company: "", role: "", duration: "" });
+  const [newExp, setNewExp] = useState({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
   const [saving, setSaving] = useState(false);
-
-
   // edit mode for an existing user
   const [editIndex, setEditIndex] = useState(-1);
-  const [editExp, setEditExp] = useState({ company: "", role: '', duration: '' })
+  const [editExp, setEditExp] = useState({ company: "", role: '', dateOfJoining: "", dateOfLeaving: "" });
+
+
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await fetch("/api/employees");
+        const data = await res.json();
+        console.log("Employees API response:", data);
+
+        if (Array.isArray(data.employees)) {
+          setEmployees(data.employees);
+        }
+      } catch (err) {
+        console.log("Failed to load employees", err);
+      }
+    };
+    fetchEmployees();
+  }, []);
+
 
 
   // fetching deprtments from mongo
@@ -55,25 +69,12 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     fetchDepartments();
   }, []);
 
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const res = await fetch("/api/departments");
-        const data = await res.json();
-        setDepartments(data);
-      } catch (err) {
-        console.error("Failed to load departments:", err);
-      }
-    };
-    fetchDepartments();
-  }, []);
-
-
   const emptyProject = {
     name: '',
     description: '',
     technologies: [],
-    duration: '',
+    projectStartDate: '',
+    projectEndDate: '',
     company: '',
   };
 
@@ -150,9 +151,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     }
     fetchRoles();
   }, []);
-
-  // console.log("fetched roles", roles);
-
 
   const [formData, setFormData] = useState({
     personalInfo: {
@@ -238,7 +236,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
 
   //  addExperience
   const addExperience = (exp) => {
-    if (!exp || (!exp.company && !exp.role && !exp.duration)) return;
+    if (!exp || (!exp.company && !exp.role && !exp.dateOfJoining && !exp.dateOfLeaving)) return;
     setFormData((prev) => ({
       ...prev,
       jobInfo: {
@@ -262,7 +260,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       };
     });
     setEditIndex(-1);
-    setEditExp({ company: "", role: "", duration: "" })
+    setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" })
   };
   // delete experience
   const deleteExperience = (i) => {
@@ -276,21 +274,9 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     // if we were editing this item, exit edit mode
     if (editIndex === index) {
       setEditIndex(-1);
-      setEditExp({ company: "", role: "", duration: "" });
+      setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
     }
   };
-  // // cancel experience while adding
-  // const cancelAddExperience = () => {
-  //   setIsAddingExperience(false);
-  //   setNewExp({ company: "", role: "", duration: "" })
-  // }
-  // // saving experience
-  // const saveNewExperience = () => {
-  //   if (!newExp.company && !newExp.role && !newExp.duration) return;
-  //   addExperience(newExp);
-  //   setNewExp({ company: "", role: "", duration: "" });
-  //   setIsAddingExperience(false);
-  // }
 
   const saveNewExperience = async () => {
     // Basic validation example
@@ -310,14 +296,14 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     }));
 
     setIsAddingExperience(false);
-    setNewExp({ company: '', role: '', dusration: '' })
+    setNewExp({ company: '', role: '', dateOfJoining: "", dateOfLeaving: "" })
 
 
   };
 
   const cancelAddExperience = () => {
     // reset and close
-    setNewExp({ company: "", role: "", duration: "" });
+    setNewExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
     setIsAddingExperience(false);
   };
 
@@ -423,7 +409,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
 
       if (isEdit && initialData?._id) {
         url = `/api/employees/${initialData._1?._id || initialData._id || initialData.id}`; // safe read if shape differs
-        // better: use initialData._id
+
         url = `/api/employees/${initialData._id}`;
         method = "PUT";
         // For PUT send only fields you want to update, or full nested objects
@@ -512,6 +498,8 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           {message}
         </p>
       )}
+
+      {/* personal Information */}
       <div className="space-y-2">
         <h2 className="text-secondary-dark800 font-semibold">Personal Information</h2>
         <div className="flex gap-3">
@@ -625,14 +613,12 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           <label
             htmlFor="contactNumber"
             className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-
           >Contact Number</label>
-
         </div>
-
-
       </div>
+
       <hr className="text-grey-700" />
+      {/* Job info */}
       <div className="space-y-2">
         <h2 className="text-secondary-dark800 font-semibold">Job Information</h2>
 
@@ -662,7 +648,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
               <option value="" className="" >-- Select Department --</option>
               {
                 departments.map((dept) => (
-                  <option key={dept._id} value={dept._id} className="bg-primary-light50 text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800" >
+                  <option key={dept._id} value={dept._id} className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800" >
                     {dept.name}
                   </option>
                 ))
@@ -670,45 +656,44 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             </select>
           </div>
         </div>
-        {/* <select
-  value={formData.jobInfo.departmentId}
-  onChange={(e) => handleChange("jobInfo", "departmentId", e.target.value)}
-  className="w-full p-2 border rounded"
->
-  <option value="">-- Select Department --</option>
-  {departments.map((dept) => (
-    <option key={dept.code} value={dept.code}>
-      {dept.name}
-    </option>
-  ))}
-</select> */}
 
-        {/* <input
-            type="text"
-            name="departmentId"
-            placeholder="Department Id"
-            value={formData.jobInfo.departmentId}
-            onChange={(e) => handleChange("jobInfo", "departmentId", e.target.value)}
-            className="w-full p-2 border rounded"
-          /> */}
 
         <div className="flex gap-3">
           <div className="relative flex-1">
-            <input
-              type="text"
+            <select
               name="managerId"
-              placeholder="Manager Id"
-              value={formData.jobInfo.managerId || ''}
+              value={formData.jobInfo.managerId || ""}
               onChange={(e) => handleChange("jobInfo", "managerId", e.target.value)}
-              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-            />
+              className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
+            >
+              <option value="">-- Select manager --</option>
+              {employees.map((emp) => (
+                <option key={emp._id} value={emp._id}
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  {emp.personalInfo?.firstName} {emp.personalInfo?.lastName} — {emp.departmentName}
+                </option>
+              ))}
+            </select>
+
             <label
               htmlFor="managerId"
               className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
             >
-              Manager Id
+              Manager
             </label>
           </div>
+
+          {/* <input
+                type="text"
+                name="managerId"
+                placeholder="Manager Id"
+                value={formData.jobInfo.managerId || ''}
+                onChange={(e) => handleChange("jobInfo", "managerId", e.target.value)}
+                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+              /> */}
+
+
 
           <div className="relative flex-1">
             <select
@@ -760,7 +745,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           <div className="relative flex-1">
             <input
               name="dateOfJoining"
-
               type="date"
               value={formData.jobInfo.dateOfJoining}
               onChange={(e) => handleChange("jobInfo", "dateOfJoining", e.target.value)}
@@ -819,112 +803,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           <div>
             <h3 className="font-semibold text-secondary-dark800">Experiences</h3>
 
-            {/* {(!formData.jobInfo || (formData.jobInfo.experiences || []).length === 0) ? (
-              <p className="text-gray-500 text-sm">No experience added yet.</p>
-            ) : (
-              (formData.jobInfo.experiences || []).map((exp, i) => (
-                <div key={i} className="border p-3 rounded mb-2">
-                  {editIndex === i ? (
-                    // Edit mode for this experience
-                    <div className="flex flex-col gap-3">
-                      <div className="relative flex-1">
-                        <input
-                          placeholder=""
-                          value={editExp.company}
-                          onChange={(e) => setEditExp((p) => ({ ...p, company: e.target.value }))}
-                          className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                        />
-                        <label
-                          htmlFor="company"
-                          className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                        >
-                          Company Name
-                        </label>
-
-                      </div>
-                      <div className="relative flex-1">
-                        <input
-                          placeholder="Role"
-                          value={editExp.role}
-                          onChange={(e) => setEditExp((p) => ({ ...p, role: e.target.value }))}
-                          className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                        />
-                        <label
-                          htmlFor="role"
-                          className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                        >
-                          Role Name
-                        </label>
-                      </div>
-                      <div className="relative flex-1">
-                        <input
-                          placeholder="Duration"
-                          value={editExp.duration}
-                          onChange={(e) => setEditExp((p) => ({ ...p, duration: e.target.value }))}
-                          className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                        />
-                        <label
-                          htmlFor="duration"
-                          className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                        >
-                          Duration
-                        </label>
-
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => updateExperience(i, editExp)}
-                          className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditIndex(-1);
-                            setEditExp({ company: "", role: "", duration: "" });
-                          }}
-                          className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 px-3 py-1 rounded cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    // Read mode for this experience
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="font-semibold">{exp.company || "—"}</div>
-                        <div className="text-sm">{exp.role || "—"} {exp.duration ? `— ${exp.duration}` : ""}</div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditIndex(i);
-                            setEditExp({ company: exp.company || "", role: exp.role || "", duration: exp.duration || "" });
-                          }}
-                          className="bg-primary-dark600 text-grey-50 hover:bg-primary-dark800 font-medium cursor-pointer px-2 py-1 rounded"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteExperience(i)}
-                          className="bg-secondary-dark600 text-grey-50 hover:bg-secondary-dark800 font-medium cursor-pointer px-2 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
-            )} */}
-
-
             {(formData.jobInfo?.experiences || []).length === 0 ? (
               <p className="text-gray-500 text-sm">No experience added yet.</p>
             ) : (
@@ -932,7 +810,12 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                 <div key={i} className="border p-3 rounded mb-2 flex items-start justify-between">
                   <div>
                     <div className="font-semibold">{exp.company || "—"}</div>
-                    <div className="text-sm">{exp.role || "—"} {exp.duration ? `— ${exp.duration}` : ""}</div>
+                    <div className="text-sm">{exp.role || "—"}
+                    </div>
+                    <div className="text-sm"> {exp.dateOfStart}</div>
+                    <div className="text-sm"> {exp.dateOfEnd}</div>
+
+
                   </div>
 
                   <div className="flex gap-2">
@@ -940,7 +823,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                     <Dialog open={editIndex === i} onOpenChange={(open) => {
                       if (!open) {
                         setEditIndex(-1);
-                        setEditExp({ company: "", role: "", duration: "" });
+                        setEditExp({ company: "", role: "", dateOfStart: "", dateOfEnd: "" });
                       }
                     }}>
                       <Button
@@ -951,7 +834,8 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                           setEditExp({
                             company: exp.company || "",
                             role: exp.role || "",
-                            duration: exp.duration || "",
+                            dateOfJoining: exp.dateOfJoining || "",
+                            dateOfLeaving: exp.dateOfLeaving || "",
                           });
                         }}
                       >
@@ -969,32 +853,41 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                         <div className="flex flex-col gap-3 py-3">
                           <div className="relative flex-1">
                             <input
-                              placeholder="Company"
+                              placeholder=""
                               value={editExp.company}
                               onChange={(e) => setEditExp((p) => ({ ...p, company: e.target.value }))}
                               className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                             />
-                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Company</label>
+                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Company Name</label>
                           </div>
 
                           <div className="relative flex-1">
                             <input
-                              placeholder="Role"
+                              placeholder=""
                               value={editExp.role}
                               onChange={(e) => setEditExp((p) => ({ ...p, role: e.target.value }))}
                               className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                             />
-                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Role</label>
+                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Role Name</label>
                           </div>
 
                           <div className="relative flex-1">
                             <input
-                              placeholder="Duration"
-                              value={editExp.duration}
-                              onChange={(e) => setEditExp((p) => ({ ...p, duration: e.target.value }))}
+                              placeholder=""
+                              value={editExp.dateOfJoining}
+                              onChange={(e) => setEditExp((p) => ({ ...p, dateOfJoining: e.target.value }))}
                               className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                             />
-                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Duration</label>
+                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Date of Joining</label>
+                          </div>
+                          <div className="relative flex-1">
+                            <input
+                              placeholder=""
+                              value={editExp.dateOfLeaving}
+                              onChange={(e) => setEditExp((p) => ({ ...p, dateOfLeaving: e.target.value }))}
+                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                            />
+                            <label className="absolute left-3 top-1 text-gray-500 text-xs">Date of Leaving</label>
                           </div>
                         </div>
 
@@ -1015,7 +908,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                             variant="secondary"
                             onClick={() => {
                               setEditIndex(-1);
-                              setEditExp({ company: "", role: "", duration: "" });
+                              setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
                             }}
                             className="bg-secondary-dark600 hover:bg-secondary-dark800  text-grey-50 font-medium cursor-pointer rounded-md text-sm"
                           >
@@ -1039,8 +932,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
               ))
             )}
           </div>
-
-
           {/* add experience */}
           <div>
             {/* Main trigger */}
@@ -1087,14 +978,28 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
 
                   <div className="relative">
                     <input
-                      id="duration"
+                      type="date"
+                      id="dateOfJoining"
                       placeholder=""
-                      value={newExp.duration}
-                      onChange={(e) => setNewExp((p) => ({ ...p, duration: e.target.value }))}
+                      value={newExp.dateOfJoining}
+                      onChange={(e) => setNewExp((p) => ({ ...p, dateOfJoining: e.target.value }))}
                       className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                     />
                     <label htmlFor="duration" className="absolute left-3 top-1 text-gray-500 text-xs">
-                      Duration
+                      Date of Joining
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      id="dateOfLeaving"
+                      placeholder=""
+                      value={newExp.dateOfLeaving}
+                      onChange={(e) => setNewExp((p) => ({ ...p, dateOfLeaving: e.target.value }))}
+                      className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                    />
+                    <label htmlFor="duration" className="absolute left-3 top-1 text-gray-500 text-xs">
+                      Date of Leaving
                     </label>
                   </div>
 
@@ -1128,196 +1033,174 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             </Dialog>
           </div>
 
-          {/* <div>
-            <button
-              type="button"
-              onClick={() => setIsAddingExperience(true)}
-              className="bg-secondary-light50 text-secondary-dark800 font-medium px-3 py-1 rounded"
-            >
-              + Add Experience
-            </button>
-            {isAddingExperience && (
-              <div className="mt-2 p-3 border rounded bg-gray-50">
-                <input
-                  placeholder="Company"
-                  value={newExp.company}
-                  onChange={(e) => setNewExp((p) => ({ ...p, company: e.target.value }))}
-                  className="block w-full mb-2 p-2 border rounded"
-                />
-                <input
-                  placeholder="Role"
-                  value={newExp.role}
-                  onChange={(e) => setNewExp((p) => ({ ...p, role: e.target.value }))}
-                  className="block w-full mb-2 p-2 border rounded"
-                />
-                <input
-                  placeholder="Duration"
-                  value={newExp.duration}
-                  onChange={(e) => setNewExp((p) => ({ ...p, duration: e.target.value }))}
-                  className="block w-full mb-2 p-2 border rounded"
-                />
-                <div className="flex gap-2">
-                  <button type="button" onClick={saveNewExperience} className="bg-green-500 text-white px-3 py-1 rounded">
-                    Save
-                  </button>
-                  <button type="button" onClick={cancelAddExperience} className="bg-gray-300 px-3 py-1 rounded">
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div> */}
         </div>
 
         {/* PAst projects */}
-        <div>
-          <h3 className="font-semibold text-secondary-dark800">Add Past Projects</h3>
-          {/* Empty state */}
-          {(!formData.jobInfo || (formData.jobInfo.pastProjects || []).length === 0) && !showProjectForm && projectEditIndex === -1 ? (
-            <p className="text-gray-500 text-sm">No past projects added yet.</p>
-          ) : (
-            (formData.jobInfo?.pastProjects || []).map((proj, idx) => (
-              <div key={idx} className="border p-3 rounded mb-2">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="font-semibold">{proj.name || "—"}</div>
-                      <div className="text-sm">{proj.description || ""}</div>
-                      <div className="flex gap-2 flex-wrap mt-1">
-                        {(proj.technologies || []).map((t, i) => (
-                          <span key={i} className="px-2 py-1 bg-gray-100 rounded text-sm">{t}</span>
-                        ))}
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-secondary-dark800">Add Past Projects</h3>
+            {/* Empty state */}
+            {(!formData.jobInfo || (formData.jobInfo.pastProjects || []).length === 0) && !showProjectForm && projectEditIndex === -1 ? (
+              <p className="text-gray-500 text-sm">No past projects added yet.</p>
+            ) : (
+              (formData.jobInfo?.pastProjects || []).map((proj, idx) => (
+                <div key={idx} className="border p-3 rounded mb-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="font-semibold">{proj.name || "—"}</div>
+                        <div className="text-sm">{proj.description || ""}</div>
+                        <div className="flex gap-2 flex-wrap mt-1">
+                          {(proj.technologies || []).map((t, i) => (
+                            <span key={i} className="px-2 py-1 bg-gray-100 rounded text-sm">{t}</span>
+                          ))}
+                        </div>
+                        <div className="text-sm">{proj.duration || ""}</div>
+                        <div className="text-sm">{proj.company || ""}</div>
                       </div>
-                      <div className="text-sm">{proj.duration || ""}</div>
-                      <div className="text-sm">{proj.company || ""}</div>
-                    </div>
 
-                    {/* <div className="flex gap-2">
+                      {/* <div className="flex gap-2">
                       <button type="button" onClick={() => startEditProject(idx)} className="bg-primary-dark600 text-white font-medium px-2 py-1 rounded cursor-pointer">Edit</button>
                       <button type="button" onClick={() => deleteProject(idx)} className="bg-secondary-dark600 text-white  font-medium cursor-pointer px-2 py-1 rounded">Delete</button>
                     </div> */}
-                  </div>
-                  <div className="flex gap-2">
-                    <Dialog
-                      open={projectEditIndex === idx}
-                      onOpenChange={(open) => setProjectEditIndex(open ? idx : -1)}
-                    >
-                      <DialogTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => startEditProject(idx)}
-                          className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 text-sm  rounded-md"
-                        >
-                          Edit
-                        </button>
-                      </DialogTrigger>
+                    </div>
+                    <div className="flex gap-2">
+                      <Dialog
+                        open={projectEditIndex === idx}
+                        onOpenChange={(open) => setProjectEditIndex(open ? idx : -1)}
+                      >
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => startEditProject(idx)}
+                            className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 text-sm  rounded-md"
+                          >
+                            Edit
+                          </button>
+                        </DialogTrigger>
 
-                      <DialogContent className="sm:max-w-lg">
-                        <DialogHeader>
-                          <DialogTitle>Edit Past Project</DialogTitle>
-                        </DialogHeader>
-                        {/* // EDIT MODE (uses projectEditData) */}
-                        <div className="flex flex-col gap-3">
-                          <div className="relative flex-1">
-                            <input
-                              placeholder=""
-                              value={projectEditData.name}
-                              onChange={(e) => setProjectEditData((p) => ({ ...p, name: e.target.value }))}
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="projectName"
-                              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                            >
-                              Project Name
-                            </label>
-                          </div>
-                          <div className="relative flex-1">
-                            <textarea
-                              placeholder=""
-                              value={projectEditData.description}
-                              onChange={(e) => setProjectEditData((p) => ({ ...p, description: e.target.value }))}
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="project description"
-                              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                            >Project Description</label>
-                          </div>
-                          {/* technologies chips + add input */}
-                          <div className="mb-2">
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              {(projectEditData.technologies || []).map((t, i) => (
-                                <span key={i} className="px-2 py-1 bg-primary-light50 font-medium cursor-pointer rounded flex items-center gap-2">
-                                  <span>{t}</span>
-                                  <button type="button" onClick={() => removeTechFromEditProject(i)} className=" font-medium cursor-pointer ">×</button>
-                                </span>
-                              ))}
+                        <DialogContent className="sm:max-w-lg">
+                          <DialogHeader>
+                            <DialogTitle>Edit Past Project</DialogTitle>
+                          </DialogHeader>
+                          {/* // EDIT MODE (uses projectEditData) */}
+                          <div className="flex flex-col gap-3">
+                            <div className="relative flex-1">
+                              <input
+                                placeholder=""
+                                value={projectEditData.name}
+                                onChange={(e) => setProjectEditData((p) => ({ ...p, name: e.target.value }))}
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                              />
+                              <label
+                                htmlFor="projectName"
+                                className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                              >
+                                Project Name
+                              </label>
                             </div>
-                            <div className="flex gap-2">
-                              <div className="relative flex-1">
-                                <input
-                                  placeholder=""
-                                  value={editProjectTechInput}
-                                  onChange={(e) => setEditProjectTechInput(e.target.value)}
-                                  className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                                />
-                                <label
-                                  htmlFor="add technology"
-                                  className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                                >
-                                  Add technology
-                                </label>
+                            <div className="relative flex-1">
+                              <textarea
+                                placeholder=""
+                                value={projectEditData.description}
+                                onChange={(e) => setProjectEditData((p) => ({ ...p, description: e.target.value }))}
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                              />
+                              <label
+                                htmlFor="project description"
+                                className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                              >Project Description</label>
+                            </div>
+                            {/* technologies chips + add input */}
+                            <div className="mb-2">
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {(projectEditData.technologies || []).map((t, i) => (
+                                  <span key={i} className="px-2 py-1 bg-primary-light50 font-medium cursor-pointer rounded flex items-center gap-2">
+                                    <span>{t}</span>
+                                    <button type="button" onClick={() => removeTechFromEditProject(i)} className=" font-medium cursor-pointer ">×</button>
+                                  </span>
+                                ))}
                               </div>
+                              <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                  <input
+                                    placeholder=""
+                                    value={editProjectTechInput}
+                                    onChange={(e) => setEditProjectTechInput(e.target.value)}
+                                    className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                                  />
+                                  <label
+                                    htmlFor="add technology"
+                                    className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                                  >
+                                    Add technology
+                                  </label>
+                                </div>
 
-                              <button type="button" onClick={addTechToEditProject} className="px-3 bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 rounded">Add</button>
+                                <button type="button" onClick={addTechToEditProject} className="px-3 bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 rounded">Add</button>
+                              </div>
+                            </div>
+                            <div className="relative flex-1">
+                              <input
+                                type="date"
+                                placeholder=""
+                                value={projectEditData.projectStartDate}
+                                onChange={(e) => setProjectEditData((p) => ({ ...p, projectStartDate: e.target.value }))}
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                              />
+                              <label
+                                htmlFor="projectStartDate"
+                                className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                              >
+                                Project Start Date
+                              </label>
+                            </div>
+                            <div className="relative flex-1">
+                              <input
+                                type="date"
+                                placeholder=""
+                                value={projectEditData.projectEndDate}
+                                onChange={(e) => setProjectEditData((p) => ({ ...p, projecEndDate: e.target.value }))}
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                              />
+                              <label
+                                htmlFor="projecEndDate"
+                                className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                              >
+                                Project End Date
+                              </label>
+                            </div>
+                            <div className="relative flex-1">
+                              <input
+                                placeholder="Company"
+                                value={projectEditData.company}
+                                onChange={(e) => setProjectEditData((p) => ({ ...p, company: e.target.value }))}
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                              />
+                              <label
+                                htmlFor="Company Name"
+                                className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                              >
+                                Company Name
+                              </label>
+                            </div>
+
+                            <div className="flex gap-2">
+                              <button type="button" onClick={() => updateProject(idx)} className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 rounded-md text-sm">Save</button>
+                              <button type="button" onClick={cancelEditProject} className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 rounded-md text-sm">Cancel</button>
                             </div>
                           </div>
-                          <div className="relative flex-1">
-                            <input
-                              placeholder="Duration"
-                              value={projectEditData.duration}
-                              onChange={(e) => setProjectEditData((p) => ({ ...p, duration: e.target.value }))}
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="project  duration"
-                              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                            >
-                              Project Duration
-                            </label>
-                          </div>
-                          <div className="relative flex-1">
-                            <input
-                              placeholder="Company"
-                              value={projectEditData.company}
-                              onChange={(e) => setProjectEditData((p) => ({ ...p, company: e.target.value }))}
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="Company Name"
-                              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                            >
-                              Company Name
-                            </label>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <button type="button" onClick={() => updateProject(idx)} className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 rounded-md text-sm">Save</button>
-                            <button type="button" onClick={cancelEditProject} className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 rounded-md text-sm">Cancel</button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    {/* Delete Button */}
-                    <button type="button" onClick={() => deleteProject(idx)} className="bg-secondary-dark600 text-white  font-medium cursor-pointer px-4 py-2 text-sm  rounded-md">Delete</button>
+                        </DialogContent>
+                      </Dialog>
+                      {/* Delete Button */}
+                      <button type="button" onClick={() => deleteProject(idx)} className="bg-secondary-dark600 text-white  font-medium cursor-pointer px-4 py-2 text-sm  rounded-md">Delete</button>
 
 
+                    </div>
                   </div>
                 </div>
-              </div>
-            )))}
-
+              )))}
+          </div>
           {/* Add past Project Button & Form */}
           <div>
             <button
@@ -1419,23 +1302,43 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                     </div>
                   </div>
 
-                  {/* Duration */}
+                  {/*project satrt Duration */}
                   <div className="relative flex-1">
                     <input
+                      type="date"
                       placeholder=""
-                      value={newProject.duration}
+                      value={newProject.projectStartDate}
                       onChange={(e) =>
-                        setNewProject({ ...newProject, duration: e.target.value })
+                        setNewProject({ ...newProject, projectStartDate: e.target.value })
                       }
                       className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                     />
                     <label
-                      htmlFor="duration"
+                      htmlFor="projectStartDate"
                       className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
                     >
-                      Duration
+                      project Start Date
                     </label>
                   </div>
+                  {/* Project End date */}
+                  <div className="relative flex-1">
+                    <input
+                      type="date"
+                      placeholder=""
+                      value={newProject.projectEndDate}
+                      onChange={(e) =>
+                        setNewProject({ ...newProject, projectEndDate: e.target.value })
+                      }
+                      className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                    />
+                    <label
+                      htmlFor="projectStartDate"
+                      className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                    >
+                      project End Date
+                    </label>
+                  </div>
+
 
                   {/* Company */}
                   <div className="relative flex-1">
@@ -1487,223 +1390,139 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           </div>
         </div>
         {/* editing current project */}
-        <div>
-          <h3 className="font-semibold text-secondary-dark800">Current Projects</h3>
-          {(formData.currentProjects || []).length === 0 ? (
-            <p className="text-gray-500 text-sm">No current projects added yet.</p>
-          ) : (
-            formData.currentProjects.map((proj, idx) => (
-              <div key={idx} className="border p-3 rounded mb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="font-semibold">Project ID: {proj.projectId}</div>
-                    <div className="text-sm">Role: {proj.role}</div>
-                    <div className="text-sm">Assigned: {proj.assignedDate}</div>
-                  </div>
-                  <div className="flex gap-2">
-                    {/* Edit Button triggers modal */}
-                    <Dialog
-                      open={editCurrentIndex === idx}
-                      onOpenChange={(open) => setEditCurrentIndex(open ? idx : -1)}
-                    >
-                      <DialogTrigger asChild>
-                        <button
-                          type="button"
-                          className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer  rounded-md text-sm px-4 py-2"
-                        >
-                          Edit
-                        </button>
-                      </DialogTrigger>
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-secondary-dark800">Current Projects</h3>
+            {(formData.currentProjects || []).length === 0 ? (
+              <p className="text-gray-500 text-sm">No current projects added yet.</p>
+            ) : (
+              formData.currentProjects.map((proj, idx) => (
+                <div key={idx} className="border p-3 rounded mb-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold">Project ID: {proj.projectId}</div>
+                      <div className="text-sm">Role: {proj.role}</div>
+                      <div className="text-sm">Assigned: {proj.assignedDate}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      {/* Edit Button triggers modal */}
+                      <Dialog
+                        open={editCurrentIndex === idx}
+                        onOpenChange={(open) => setEditCurrentIndex(open ? idx : -1)}
+                      >
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer  rounded-md text-sm px-4 py-2"
+                          >
+                            Edit
+                          </button>
+                        </DialogTrigger>
 
-                      <DialogContent className="sm:max-w-lg">
-                        <DialogHeader>
-                          <DialogTitle>Edit Current Project</DialogTitle>
-                        </DialogHeader>
+                        <DialogContent className="sm:max-w-lg">
+                          <DialogHeader>
+                            <DialogTitle>Edit Current Project</DialogTitle>
+                          </DialogHeader>
 
-                        <div className="flex flex-col gap-3 mt-3">
-                          {/* Project ID */}
-                          <div className="relative flex-1">
-                            <input
-                              placeholder=""
-                              value={proj.projectId}
-                              onChange={(e) =>
-                                handleCurrentChange(idx, "projectId", e.target.value)
-                              }
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 
+                          <div className="flex flex-col gap-3 mt-3">
+                            {/* Project ID */}
+                            <div className="relative flex-1">
+                              <input
+                                placeholder=""
+                                value={proj.projectId}
+                                onChange={(e) =>
+                                  handleCurrentChange(idx, "projectId", e.target.value)
+                                }
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 
                                focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="ProjectId"
-                              className="absolute left-3 top-1 text-gray-500 text-xs 
+                              />
+                              <label
+                                htmlFor="ProjectId"
+                                className="absolute left-3 top-1 text-gray-500 text-xs 
                                transition-colors peer-focus:text-primary-dark600"
-                            >
-                              Project Id
-                            </label>
-                          </div>
+                              >
+                                Project Id
+                              </label>
+                            </div>
 
-                          {/* Role */}
-                          <div className="relative flex-1">
-                            <input
-                              placeholder="Role"
-                              value={proj.role}
-                              onChange={(e) =>
-                                handleCurrentChange(idx, "role", e.target.value)
-                              }
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 
+                            {/* Role */}
+                            <div className="relative flex-1">
+                              <input
+                                placeholder="Role"
+                                value={proj.role}
+                                onChange={(e) =>
+                                  handleCurrentChange(idx, "role", e.target.value)
+                                }
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 
                                focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="Role"
-                              className="absolute left-3 top-1 text-gray-500 text-xs 
+                              />
+                              <label
+                                htmlFor="Role"
+                                className="absolute left-3 top-1 text-gray-500 text-xs 
                                transition-colors peer-focus:text-primary-dark600"
-                            >
-                              Role Name
-                            </label>
-                          </div>
+                              >
+                                Role Name
+                              </label>
+                            </div>
 
-                          {/* Assigned Date */}
-                          <div className="relative flex-1">
-                            <input
-                              type="date"
-                              placeholder=""
-                              value={proj.assignedDate}
-                              onChange={(e) =>
-                                handleCurrentChange(idx, "assignedDate", e.target.value)
-                              }
-                              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 
+                            {/* Assigned Date */}
+                            <div className="relative flex-1">
+                              <input
+                                type="date"
+                                placeholder=""
+                                value={proj.assignedDate}
+                                onChange={(e) =>
+                                  handleCurrentChange(idx, "assignedDate", e.target.value)
+                                }
+                                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 
                                focus:border-primary-dark600 focus:outline-none"
-                            />
-                            <label
-                              htmlFor="assignedDate"
-                              className="absolute left-3 top-1 text-gray-500 text-xs 
+                              />
+                              <label
+                                htmlFor="assignedDate"
+                                className="absolute left-3 top-1 text-gray-500 text-xs 
                                transition-colors peer-focus:text-primary-dark600"
-                            >
-                              Assigned Date
-                            </label>
-                          </div>
+                              >
+                                Assigned Date
+                              </label>
+                            </div>
 
-                          {/* Actions */}
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditCurrentIndex(-1)
-                              }}
-                              className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
-                            >
-                              Save
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditCurrentIndex(-1)}
-                              className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
-                            >
-                              Cancel
-                            </button>
+                            {/* Actions */}
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditCurrentIndex(-1)
+                                }}
+                                className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditCurrentIndex(-1)}
+                                className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
+                              >
+                                Cancel
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                        </DialogContent>
+                      </Dialog>
 
-                    {/* Delete Button */}
-                    <button
-                      type="button"
-                      onClick={() => deleteCurrentProject(idx)}
-                      className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 text-sm rounded-md"
-                    >
-                      Delete
-                    </button>
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => deleteCurrentProject(idx)}
+                        className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 font-medium cursor-pointer px-4 py-2 text-sm rounded-md"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          )}
-          {/* Add Button */}
-          {/* {!showCurrentForm ? (
-            <button
-              type="button"
-              onClick={() => setShowCurrentForm(true)}
-              className="bg-secondary-dark600 hover:bg-secondary-dark800 text-grey-50 cursor-pointer font-medium px-3 py-1 rounded"
-            >
-              + Add Current Project
-            </button>
-          ) : (
-            <div className="flex flex-col gap-3 mt-3">
-              <div className="relative flex-1">
-                <input
-                  placeholder=""
-                  value={currentProjectForm.projectId}
-                  onChange={(e) =>
-                    setCurrentProjectForm({ ...currentProjectForm, projectId: e.target.value })
-                  }
-                  className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                />
-                <label
-                  htmlFor="projectId"
-                  className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-
-                >
-                  Project ID
-                </label>
-              </div>
-              <div className="relative flex-1">
-
-                <input
-                  placeholder="Role"
-                  value={currentProjectForm.role}
-                  onChange={(e) =>
-                    setCurrentProjectForm({ ...currentProjectForm, role: e.target.value })
-                  }
-                  className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                />
-                <label
-                  htmlFor="role"
-                  className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                >
-                  Role Name
-                </label>
-              </div>
-              <div className="relative flex-1">
-
-                <input
-                  type="date"
-                  value={currentProjectForm.assignedDate}
-                  onChange={(e) =>
-                    setCurrentProjectForm({ ...currentProjectForm, assignedDate: e.target.value })
-                  }
-                  className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-                />
-                <label
-                  htmlFor="assigneddate"
-                  className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-
-                >
-                  Assigned Date
-
-                </label>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => addCurrentProject(currentProjectForm)}
-                  className="bg-primary-dark600 hover:bg-primary-dark800  text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentProjectForm(emptyCurrentProject);
-                    setShowCurrentForm(false);
-                  }}
-                  className="bg-secondary-dark600 hover:bg-secondary-dark800  text-grey-50 font-medium cursor-pointer px-3 py-1 rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )} */}
+              ))
+            )}
+          </div>
           <div>
             <button
               type="button"
@@ -1850,12 +1669,14 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
         </div> */}
       </div>
 
-      <button
-        type="submit"
-        className="bg-primary-dark600 hover:bg-primary-dark800  text-grey-50 px-4 py-2 rounded shadow-md cursor-pointer"
-      >
-        {isEdit ? "Update Employee" : "Add Employee"}
-      </button>
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="bg-primary-dark600 hover:bg-primary-dark800  text-grey-50 px-4 py-2 rounded shadow-md cursor-pointer"
+        >
+          {isEdit ? "Update Employee" : "Add Employee"}
+        </button>
+      </div>
     </form>
   );
 }

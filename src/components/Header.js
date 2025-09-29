@@ -36,7 +36,7 @@ const Header = ({ user }) => {
 
 
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-gray-300">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border-3 border-secondary-dark600">
               <Image
                 src={user.avatar || defaultAvatar} // fallback avatar
                 alt={user.name || "User"}

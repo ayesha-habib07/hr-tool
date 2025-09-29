@@ -11,7 +11,7 @@ export default function AddEmployeePage() {
   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState(null);
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     if (!id) {

@@ -1,18 +1,28 @@
-// "use client";
-
 import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import EditIcon from '@mui/icons-material/Edit';
 
 export default function ProjectList({ projects, search, setSearch, onChange }) {
+
+  console.log(projects, "projectsdta")
   const handleDelete = async (id) => {
     await fetch(`/api/projects?id=${id}`, { method: "DELETE" });
     onChange();
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  // const handleSearch = (e) => {
+  //   setSearch(e.target.value);
+  // };
 
-  const filteredProjects = projects.filter((proj) => {
+  const filteredProjects = (projects || []).filter((proj) => {
     const text = search.toLowerCase();
     return (
       proj.name?.toLowerCase().includes(text) ||
@@ -24,76 +34,61 @@ export default function ProjectList({ projects, search, setSearch, onChange }) {
   });
 
   return (
-    <div className="mt-8">
-      {/* 🔍 Search */}
-      <div className="flex justify-end mb-4">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={search}
-          onChange={handleSearch}
-          className="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-sm text-white"
-        />
-      </div>
-
-      {/* 📋 Projects Table */}
-      <div className="overflow-x-auto rounded-lg shadow-lg">
-        <table className="min-w-full border border-gray-700 divide-y divide-gray-600 bg-gray-900 text-sm text-white">
-          <thead className="bg-gray-800 text-gray-300 uppercase text-xs">
-            <tr>
-              <th className="px-4 py-3 text-left">Project ID</th>
-              <th className="px-4 py-3 text-left">Name</th>
-              <th className="px-4 py-3 text-left">Client</th>
-              <th className="px-4 py-3 text-left">Type</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Priority</th>
-              <th className="px-4 py-3 text-left">Start Date</th>
-              <th className="px-4 py-3 text-left">End Date</th>
-              <th className="px-4 py-3 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-700">
-            {filteredProjects.map((proj) => (
-              <tr key={proj._id}>
-                <td className="px-2 py-2">{proj.projectId}</td>
-                <td className="px-2 py-2">{proj.name}</td>
-                <td className="px-2 py-2">{proj.client}</td>
-                <td className="px-2 py-2">{proj.type}</td>
-                <td className="px-2 py-2">{proj.status}</td>
-                <td className="px-2 py-2">{proj.priority}</td>
-                <td className="px-2 py-2">
-                  {proj.startDate ? new Date(proj.startDate).toLocaleDateString() : "-"}
-                </td>
-                <td className="px-2 py-2">
-                  {proj.endDate ? new Date(proj.endDate).toLocaleDateString() : "-"}
-                </td>
-                <td className="px-2 py-2 text-center space-x-2">
+    <>
+      <Table>
+        <TableCaption>A list of projects.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Project ID</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Client</TableHead>
+            <TableHead>Project Type</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>End Date</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="text-grey-700">
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((proj) => (
+              <TableRow key={proj._id}>
+                <TableCell>{proj.projectId}</TableCell>
+                <TableCell>{proj.name}</TableCell>
+                <TableCell>{proj.client}</TableCell>
+                <TableCell>{proj.type}</TableCell>
+                <TableCell>{proj.status}</TableCell>
+                <TableCell>{proj.priority}</TableCell>
+                <TableCell>{proj.startDate ? new Date(proj.startDate).toLocaleDateString() : "-"}</TableCell>
+                <TableCell>{proj.endDate ? new Date(proj.endDate).toLocaleDateString() : "-"}</TableCell>
+                <TableCell className="space-x-2">
                   <Link
-                    href={`/addProject?id=${proj._id}`}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-xs"
+                    href={`/dashboard/projects/addProject?id=${proj._id}`}
+                    className="bg-primary-light50 hover:bg-primary-dark600 text-primary-dark600  hover:text-grey-50 px-2 py-1 rounded-md text-xs flex items-center justify-center transition-colors duration-300 ease-in-out"
                   >
-                    Update
+                    <EditIcon fontSize="small" />
                   </Link>
-                  <button
+                  {/* <button 
                     onClick={() => handleDelete(proj._id)}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs"
                   >
                     Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  </button> */}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={9} className="text-center py-4 text-grey-700">
+                No projects found
+              </TableCell>
+            </TableRow>
+          )}
 
-            {filteredProjects.length === 0 && (
-              <tr>
-                <td colSpan="9" className="text-center py-4 text-gray-400">
-                  No projects found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+        </TableBody>
+      </Table>
+
+    </>
+  )
 }

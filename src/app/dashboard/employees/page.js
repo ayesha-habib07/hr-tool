@@ -62,7 +62,7 @@ export default function EmployeesPage() {
             + Add Employee
           </Link> */}
           <Link href="/dashboard/employees/addEmployee">
-            <Button variant="outline" className='bg-secondary-light50 text-secondary-dark800 hover:bg-secondary-light50 hover:text-secondary-dark800 cursor-pointer font-medium  rounded-lg shadow-md transition'> + Add Employee</Button>
+            <Button className='bg-secondary-light50 text-secondary-dark800 hover:bg-secondary-light50 hover:text-secondary-dark800 cursor-pointer font-medium  rounded-lg shadow-md transition'> + Add Employee</Button>
           </Link>
         </div>
         <MembersList

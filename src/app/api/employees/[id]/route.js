@@ -42,7 +42,8 @@ export async function PUT(req, { params }) {
     } else if (body.personalInfo) {
       delete body.personalInfo.password;
     }
-console.log("test api",req.json())
+    console.log("test api", req.json())
+    
     const updated = await Employee.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

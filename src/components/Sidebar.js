@@ -21,7 +21,7 @@ const Sidebar = ({ userRole }) => {
         const data = await res.json();
 
 
-        console.log(data, "apidata")
+        // console.log(data, "apidata")
         setItems(data);
       } catch (err) {
         console.error(err);
@@ -34,7 +34,7 @@ const Sidebar = ({ userRole }) => {
   const segments = pathname.split("/").filter(Boolean);
   const activeSegment = segments[1] || "dashboard";
 
-  { console.log(items, "itemsitems") }
+  // { console.log(items, "itemsitems") }
 
   return (
     <aside className="text-gray-400 p-4  flex flex-col w-16 md:w-64 transition-all duration-300">
@@ -49,7 +49,7 @@ const Sidebar = ({ userRole }) => {
           const hrefSegments = fullHref.split("/").filter(Boolean);
           const itemSegment = hrefSegments[1] || "dashboard";
 
-          console.log({ fullHref, itemSegment, activeSegment });
+          {/* console.log({ fullHref, itemSegment, activeSegment }); */}
           const isActive = activeSegment === itemSegment;
 
           return (
