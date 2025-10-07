@@ -1,7 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { Blend } from 'lucide-react';
+// import Logo from '../../../public/images/Gemini_Generated_Image_u46i6vu46i6vu46i.png'
+// import logo from '../../public/images/Gemini_Generated_Image_u46i6vu46i6vu46i.png'
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,7 +45,17 @@ export default function LoginPage() {
 
           </div>
           <div>
-            <h2> <p><Blend size={32} className="text-secondary-dark800" /></p></h2>
+            <h2>
+
+              {/* <Image
+            src={logo}
+            alt="logo"
+             width={70}
+            height={70}
+            className="w-full h-full object-cover"
+            ></Image> */}
+              <p><Blend size={32} className="text-secondary-dark800" /></p>
+            </h2>
           </div>
         </div>
         <h3 className="text-center mb-10 text-gray-900 font-medium">Sign in with email address</h3>
@@ -93,7 +107,11 @@ export default function LoginPage() {
               <p className="text-grey-500">Remember me</p>
             </div>
             <div>
-              <p className="cursor-pointer text-secondary-dark600">Forgot Password?</p>
+              <Link href='/forgot-password'
+                className="cursor-pointer text-secondary-dark600">
+                Forgot Password?
+              </Link>
+
             </div>
           </div>
           <button

@@ -40,7 +40,7 @@ export async function PUT(req, { params }) {
       delete body.personalInfo.password;
     }
     console.log("test api", req.json())
-    
+
     const updated = await Employee.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

@@ -15,6 +15,14 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 export default function EmployeeForm({ mode = "add", initialData = null, isEdit = false }) {
   const router = useRouter();
@@ -489,11 +497,10 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           {message}
         </p>
       )}
-
       {/* personal Information */}
       <div className="space-y-2">
         <h2 className="text-secondary-dark800 font-semibold">Personal Information</h2>
-        <div className="flex gap-3">
+       <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
               type="text"
@@ -532,7 +539,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
         </div>
 
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
               type="email"
@@ -613,7 +620,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       <div className="space-y-2">
         <h2 className="text-secondary-dark800 font-semibold">Job Information</h2>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
               type="text"
@@ -631,108 +638,150 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             </label>
           </div>
           <div className="relative flex-1">
-            <select
+            <Select
               value={formData.jobInfo.departmentId}
-              onChange={(e) => handleChange("jobInfo", "departmentId", e.target.value)}
-              className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
+              onValueChange={(value) => handleChange("jobInfo", "departmentId", value)}
             >
-              <option value="" className="" >-- Select Department --</option>
-              {
-                departments.map((dept) => (
-                  <option key={dept._id} value={dept._id} className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800" >
+              <SelectTrigger
+                className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none"
+              >
+                <SelectValue placeholder="-- Select Department --" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem
+                    key={dept._id}
+                    value={dept._id}
+                    className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                  >
                     {dept.name}
-                  </option>
-                ))
-              }
-            </select>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
-
-
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <select
+            <Select
               name="managerId"
               value={formData.jobInfo.managerId || ""}
               onChange={(e) => handleChange("jobInfo", "managerId", e.target.value)}
-              className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
-            >
-              <option value="">-- Select manager --</option>
-              {employees.map((emp) => (
-                <option key={emp._id} value={emp._id}
-                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
-                >
-                  {emp.personalInfo?.firstName} {emp.personalInfo?.lastName} — {emp.departmentName}
-                </option>
-              ))}
-            </select>
 
-            <label
-              htmlFor="managerId"
-              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
             >
-              Manager
-            </label>
+              <SelectTrigger
+                className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none"
+              >
+                <SelectValue placeholder='-- Select Manager --'> </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+
+                {employees.map((emp) => (
+                  <SelectItem key={emp._id} value={emp._id}
+                    className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                  >
+                    {emp.personalInfo?.firstName} {emp.personalInfo?.lastName} — {emp.departmentName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* <input
-                type="text"
-                name="managerId"
-                placeholder="Manager Id"
-                value={formData.jobInfo.managerId || ''}
-                onChange={(e) => handleChange("jobInfo", "managerId", e.target.value)}
-                className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
-              /> */}
-
-
-
           <div className="relative flex-1">
-            <select
+            <Select
               value={formData.jobInfo.employmentType}
               onChange={(e) => handleChange("jobInfo", "employmentType", e.target.value)}
-              className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
             >
-              <option value={""} className="bg-primary-light50 text-grey-700 py-2">-- Select Employment Type --</option>
-              <option value="fulltime">Full time</option>
-              <option value="parttime">Part time</option>
-            </select>
+              <SelectTrigger
+                className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
+                <SelectValue placeholder='-- Select Employment Type --'>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  Full time
+                </SelectItem>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  Part time
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <select
+            <Select
               value={formData.jobInfo.status}
               onChange={(e) => handleChange("jobInfo", "status", e.target.value)}
               className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
             >
-              <option value={""} className="bg-primary-light50 text-grey-700 py-2">-- Select Job Status --</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="onleave">On Leave</option>
-            </select>
+              <SelectTrigger
+                className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
+                <SelectValue placeholder='-- Select Job Status --'></SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  Active
+                </SelectItem>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  Inactive
+                </SelectItem>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  On Leave
+                </SelectItem>
+              </SelectContent>
+
+            </Select>
           </div>
           <div className="relative flex-1">
-
-            <select
+            <Select
               value={formData.jobInfo.location}
               onChange={(e) => handleChange("jobInfo", "location", e.target.value)}
-              className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
-            >
-              <option value={""} className="bg-primary-light50 text-grey-700 py-2">-- Select Job Location --</option>
-              <option value="onsite">On Site</option>
-              <option value="remote">Remote</option>
-              <option value="hybrid">Hybrid</option>
-            </select>
-          </div>
 
+            >
+              <SelectTrigger
+                className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none"
+              >
+                <SelectValue placeholder='-- Select Job Location --'>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  On Site
+                </SelectItem>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  Remote
+                </SelectItem>
+                <SelectItem
+                  className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                >
+                  Hybrid
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
 
 
         <div className="flex gap-3">
-
           <div className="relative flex-1">
             <input
               name="dateOfJoining"

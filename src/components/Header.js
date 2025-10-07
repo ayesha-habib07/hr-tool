@@ -5,13 +5,23 @@ import { Bell } from "lucide-react";
 import flag from '../../public/images/flag.png';
 import defaultAvatar from '../../public/images/admin.jpg'
 
+
+import logo from '../../public/images/Gemini_Generated_Image_u46i6vu46i6vu46i.png'
+
 const Header = ({ user }) => {
   return (
-    <header className="  text-secondary-dark800 bg-secondary-light50 mx-4 sm:mx-6 lg:mx-8 mt-4 mb-2 rounded-lg ">
-      <div className="py-4 px-6 sm:px-6 flex justify-between items-center">
-        <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold">
-          Dashboard
-        </h1>
+    <header className=" text-secondary-dark800 bg-secondary-light50 mx-4 sm:mx-6 lg:mx-8 mt-4 mb-2 rounded-lg ">
+      <div className="px-6 sm:px-6 flex justify-between items-center">
+        <div className="">
+          <Image
+            src={logo}
+            width={65}
+            height={65}
+            className="w-full h-full object-cover"
+            alt="HR tool"
+            
+          />
+        </div>
 
         <div className="flex items-center space-x-2 sm:space-x-6">
 

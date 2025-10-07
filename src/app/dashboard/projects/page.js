@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import ProjectList from "../../../components/ProjectList";
 
 export default function ProjectsPage() {
+  
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");

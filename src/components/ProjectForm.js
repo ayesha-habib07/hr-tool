@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function ProjectForm({ mode = "add", initialData = null, isEdit = false }) {
     const router = useRouter();
@@ -190,52 +197,66 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
 
 
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
 
-                        <select
+                        <Select
                             name="type"
                             value={form.type}
                             onChange={handleChange}
                             className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
                         >
-                            <option value={''}></option>
-                            <option value={'internal'}>Internal</option>
-                            <option value={'external'}>External</option>
-                            <option value={'r&d'}>R&D</option>
-                        </select>
-                        <label
-                            htmlFor="projectType"
-                            className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+                            <SelectTrigger className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
+                                <SelectValue placeholder=' Project Type'>
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Internal
+                                </SelectItem>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    External
+                                </SelectItem>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    R&D
+                                </SelectItem>
+                            </SelectContent>
 
-                        >
-                            Project Type
-                        </label>
+                        </Select>
+
                     </div>
                     <div className="relative flex-1">
-                        <select
+                        <Select
                             name="status"
                             value={form.status}
                             onChange={handleChange}
                             className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
                         >
-                            <option value={""}></option>
-                            <option value={'planned'}>Planned</option>
-                            <option value={'inprogress'}>In Progress</option>
-                            <option value={'onhold'}>On Hold</option>
-                            <option value={'completed'}>Completed</option>
-                        </select>
-                        <label
-                            htmlFor="projectstatus"
-                            className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-                        >
-                            Project Status
-                        </label>
+                            <SelectTrigger className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
+                                <SelectValue placeholder='Project Status'>
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Planned
+                                </SelectItem>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    In Progress
+                                </SelectItem>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    On Hold
+                                </SelectItem>
+                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Completed
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+
                     </div>
 
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
 
                         <input
@@ -251,7 +272,6 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                         >Start Date</label>
                     </div>
                     <div className="relative flex-1">
-
                         <input
                             type="date"
                             name="endDate"
@@ -268,84 +288,38 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
 
 
 
-                <div className="flex gap-3">
-
+                <div className="flex flex-col !sm:flex-row gap-3">
                     <div className="relative flex-1">
-                        <select
+                        <Select
                             name="priority"
                             value={form.priority}
                             onChange={handleChange}
-                            className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
+
                         >
-                            <option value={''}></option>
-                            <option value={'low'}>Low</option>
-                            <option value={'medium'}>Medium</option>
-                            <option value={'high'}>High</option>
-                            <option value={'critical'}>Critical</option>
-                        </select>
-                        <label
-                            htmlFor="projectPriority"
-                            className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
-
-                        >Project Priority</label>
-                    </div>
-
-                    {/* 
-                    <div className="relative flex-1 peer">
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild >
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    className="w-full border-2 border-grey-500 rounded px-3! pt-5! pb-2! flex justify-between text-grey-700 focus:border-primary-dark600 focus:outline-none"
-                                >
-                                    {form.employees.length > 0
-                                        ? `${form.employees.length} selected`
-                                        : "Select employees"}
-                                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-
-                     
-                            <PopoverContent
-                                className="w-[var(--radix-popover-trigger-width)] p-0"
-                                align="start"
+                            <SelectTrigger
+                                className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none"
                             >
-                                <Command>
-                                    <CommandInput placeholder="Search employees..." />
-                                    <CommandList className="max-h-60 overflow-y-auto">
-                                        {employees.map((emp) => {
-                                            const label = emp.personalInfo?.firstName
-                                                ? `${emp.personalInfo.firstName} ${emp.personalInfo.lastName}`
-                                                : `${emp.firstName || ""} ${emp.lastName || ""}`;
-                                            return (
-                                                <CommandItem
-                                                    key={emp._id}
-                                                    onSelect={() => toggleEmployees(emp._id)}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <Checkbox checked={form.employees.includes(emp._id)} />
-                                                    <span>{label}</span>
-                                                    {form.employees.includes(emp._id) && (
-                                                        <Check className="ml-auto h-4 w-4 text-primary" />
-                                                    )}
-                                                </CommandItem>
-                                            );
-                                        })}
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                                <SelectValue placeholder='Project Priority'>
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Low
+                                </SelectItem>
+                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Medium
+                                </SelectItem>
+                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    High
+                                </SelectItem>
+                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Critical
+                                </SelectItem>
+                            </SelectContent>
 
-            
-                        <label
-                            className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus-within:text-primary-dark600"
-                        >
-                            Assign Employees
-                        </label>
-                    </div> */}
+                        </Select>
 
-
+                    </div>
                     <div className="relative flex-1 peer">
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
