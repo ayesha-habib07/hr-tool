@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../../lib/connectDB";
+import { connectMongoose } from "../../../../lib/connectdb";
 import User from "../../../../models/User";
 import crypto from "crypto";
 
 export async function POST(req){
     try{
-        await connectDB();
+        await connectMongoose();
         const {email} = await req.json();
         if(!email){
             return NextResponse.json(

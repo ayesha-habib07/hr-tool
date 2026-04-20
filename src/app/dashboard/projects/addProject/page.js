@@ -19,7 +19,9 @@ export default function AddProjectPage() {
         }
         (async () => {
             try {
+
                 const res = await fetch(`/api/projects/${id}`);
+                
                 if (!res.ok) {
                     const txt = await res.text();
                     throw new Error(txt || `Status ${res.status}`);

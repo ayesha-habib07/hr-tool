@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation";
 export default function DepartmentForm({ mode = 'add', initialData = null, isEdit = false }) {
+    const router = useRouter();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     // const [code, setCode] = useState('');
@@ -14,44 +16,84 @@ export default function DepartmentForm({ mode = 'add', initialData = null, isEdi
             setDescription(initialData.description || "");
         }
     }, [initialData])
+    // async function handleSubmit(e) {
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     setError('');
+    //     try {
+    //         const url = isEdit ? `/api/departments/${initialData._id}` : "/api/departments"
+    //         const method = isEdit ? 'PUT' : 'POST'
+    //         const res = await fetch(url, {
+    //             method,
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ name, description }),
+    //         });
+    //         const data = await res.json();
+
+    //         if (!res.ok) {
+    //             setMessage(data.error || 'error while saving department');
+    //             throw new Error(data.error || "Failed to save department");
+    //         }
+    //         setName('');
+    //         setDescription('');
+
+    //         setMessage(isEdit ? "Department updated successfully" : "Department added successfully");
+
+    //         // Redirect to projects list
+    //         router.push("/dashboard/departments");
+
+    //         if (mode === 'add') {
+    //             setName = ''
+    //             setDescription = ''
+    //         }
+    //     }
+    //     catch (err) {
+    //         setError(err.message);
+    //     }
+    //     finally {
+    //         setLoading(false);
+    //     }
+    // }
     async function handleSubmit(e) {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        try {
-            const url = isEdit ? `/api/departments/${initialData._id}` : "/api/departments"
-            const method = isEdit ? 'PUT' : 'POST'
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, description }),
-            });
-            const data = await res.json();
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-            if (!res.ok) {
-                setMessage(data.error || 'error while saving department');
-                throw new Error(data.error || "Failed to save department");
-            }
-            setName('');
-            setDescription('');
+  try {
+    const url = isEdit ? `/api/departments/${initialData._id}` : "/api/departments";
+    const method = isEdit ? 'PUT' : 'POST';
+    
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, description }),
+    });
 
-            setMessage(isEdit ? "Department updated successfully" : "Department added successfully");
+    const data = await res.json();
 
-            // Redirect to projects list
-            router.push("/dashboard/departments");
-
-            if (mode === 'add') {
-                setName = ''
-                setDescription = ''
-            }
-        }
-        catch (err) {
-            setError(err.message);
-        }
-        finally {
-            setLoading(false);
-        }
+    if (!res.ok) {
+      setMessage(data.error || 'Error while saving department');
+      throw new Error(data.error || "Failed to save department");
     }
+
+    setName('');
+    setDescription('');
+    setMessage(isEdit ? "Department updated successfully" : "Department added successfully");
+
+    router.push("/dashboard/departments");
+
+    if (mode === 'add') {
+      setName('');
+      setDescription('');
+    }
+
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
     return (
         <>
             <div className="w-[100%]">

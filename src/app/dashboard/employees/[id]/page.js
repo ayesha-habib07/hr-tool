@@ -62,7 +62,7 @@ export default function EmployeeDetail({ params }) {
             try {
                 const res = await fetch("/api/departments");
                 const data = await res.json();
-                setDepartments(data);
+                 setDepartments(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.error("Failed to load departments:", err);
             }
@@ -153,96 +153,99 @@ export default function EmployeeDetail({ params }) {
                                     System Info
                                 </TabsTrigger>
                             </TabsList>
-                              <ScrollBar orientation="horizontal" />
+                            <ScrollBar orientation="horizontal" />
                         </ScrollArea>
-                            <hr className='text-grey-100  mb-6'></hr>
-                            <TabsContent value="personal" className="text-grey-700">
-                                <p className='py-2'><strong>First Name: </strong>{employee.personalInfo.firstName}</p>
+                        <hr className='text-grey-100  mb-6'></hr>
+                        <TabsContent value="personal" className="text-grey-700">
+                            <p className='py-2'><strong>First Name: </strong>{employee.personalInfo.firstName}</p>
 
-                                <p className='py-2'><strong>Last Name: </strong>{employee.personalInfo.lastName}</p>
-                                <p className='py-2'><strong>Email: </strong>{employee.personalInfo.email}</p>
-                                <p className='py-2'><strong>Contact Number: </strong>{employee.personalInfo.contactNumber}</p>
-                            </TabsContent>
-                            <TabsContent value="job" className="text-grey-700">
-                                <p><strong>Title:</strong> {employee.jobInfo.title}</p>
+                            <p className='py-2'><strong>Last Name: </strong>{employee.personalInfo.lastName}</p>
+                            <p className='py-2'><strong>Email: </strong>{employee.personalInfo.email}</p>
+                            <p className='py-2'><strong>Contact Number: </strong>{employee.personalInfo.contactNumber}</p>
+                        </TabsContent>
+                        <TabsContent value="job" className="text-grey-700">
+                            <p><strong>Title:</strong> {employee.jobInfo.title}</p>
 
 
 
-                                <p className='py-2'><strong>Department: </strong> {getDepartmentName(employee.jobInfo.departmentId)}</p>
-                                <p className='py-2'><strong>Manager: </strong>{employee.jobInfo.managerId?.personalInfo?.firstName || "N/A"}</p>
-                                <p className='py-2'><strong>Employee Type: </strong> {employee.jobInfo.employmentType}</p>
-                                <p className='py-2'><strong>Status: </strong> {employee.jobInfo.status}</p>
-                                <p className='py-2'><strong>Location: </strong> {employee.jobInfo.location}</p>
-                                <div>
-                                    <strong>Skills</strong>
-                                    {employee.jobInfo.skills?.length > 0 ? (
-                                        <ul className='list-disc pl-6'>
-                                            {employee.jobInfo.skills.map((skill, idx) => (
-                                                <li key={idx}>{skill}</li>
-                                            ))}
+                            <p className='py-2'><strong>Department: </strong> {getDepartmentName(employee.jobInfo.departmentId)}</p>
+                            <p className='py-2'><strong>Manager: </strong>{employee.jobInfo.managerId?.personalInfo?.firstName || "N/A"}</p>
+                            <p className='py-2'><strong>Employee Type: </strong> {employee.jobInfo.employmentType}</p>
+                            <p className='py-2'><strong>Status: </strong> {employee.jobInfo.status}</p>
+                            <p className='py-2'><strong>Location: </strong> {employee.jobInfo.location}</p>
+                            <div>
+                                <strong>Skills</strong>
+                                {employee.jobInfo.skills?.length > 0 ? (
+                                    <ul className='list-disc pl-6'>
+                                        {employee.jobInfo.skills.map((skill, idx) => (
+                                            <li key={idx}>{skill}</li>
+                                        ))}
 
-                                        </ul>) : (<p>No skill added yet</p>)}
-                                </div>
-                                {/* experiences */}
-                                <div className='mt-4 '>
-                                    <strong>Experiences</strong>
-                                    {employee.jobInfo.experiences?.length > 0 ? (
-                                        <ul>
-                                            {employee.jobInfo.experiences.map((exp, idx) => (
-                                                <li key={idx}>
-                                                    <p><strong>Company Name: </strong>{exp.company}</p>
-                                                    <p><strong>Role: </strong>{exp.role}</p>
-                                                    <p><strong>Date Of Joining: </strong>{exp.dateOfJoining}</p>
-                                                    <p><strong>Date Of Leaving: </strong>{exp.dateOfLeaving}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (<p>No experience added.</p>)}
-                                </div>
-                                <div className="mt-4">
-                                    <strong>Past Projects:</strong>
-                                    {employee.jobInfo.pastProjects?.length > 0 ? (
-                                        <ul className="list-disc pl-6">
-                                            {employee.jobInfo.pastProjects.map((proj, idx) => (
-                                                <li key={idx}>
-                                                    <p><strong>Name:</strong> {proj.name}</p>
-                                                    <p><strong>Description:</strong> {proj.description}</p>
-                                                    <p><strong>Technologies:</strong> {proj.technologies?.join(", ")}</p>
-                                                    <p><strong>projectStartDate:</strong> {proj.projectStartDate}</p>
-                                                    <p><strong>projectEndDate:</strong> {proj.projectStartDate}</p>
-                                                    <p><strong>Company:</strong> {proj.company}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>No past projects added</p>
-                                    )}
-                                </div>
+                                    </ul>) : (<p>No skill added yet</p>)}
+                            </div>
+                            {/* experiences */}
+                            <div className='mt-4 '>
+                                <strong>Experiences</strong>
+                                {employee.jobInfo.experiences?.length > 0 ? (
+                                    <ul>
+                                        {employee.jobInfo.experiences.map((exp, idx) => (
+                                            <li key={idx}>
+                                                <p><strong>Company Name: </strong>{exp.company}</p>
+                                                <p><strong>Role: </strong>{exp.role}</p>
+                                                <p><strong>Date Of Joining: </strong>{exp.dateOfJoining}</p>
+                                                <p><strong>Date Of Leaving: </strong>{exp.dateOfLeaving}</p>
+                                                <p><strong>Years of Experience: </strong>{exp.yearsOfExperience} years</p>
+                                                <p><strong>ExpertiseLevel: </strong>{exp.expertiseLevel}</p>
 
-                            </TabsContent>
-                            <TabsContent value="projects" className="text-grey-700">
-                                {
-                                    employee.currentProjects?.length > 0 ? (
-                                        <ul className="list-disc pl-4">
-                                            {employee.currentProjects.map((p, i) => (
-                                                <li key={i}>
-                                                    {p.role} ({new Date(p.assignedDate).toLocaleDateString()} → Present)
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>No current projects</p>
-                                    )
-                                }
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (<p>No experience added.</p>)}
+                            </div>
+                            <div className="mt-4">
+                                <strong>Past Projects:</strong>
+                                {employee.jobInfo.pastProjects?.length > 0 ? (
+                                    <ul className="list-disc pl-6">
+                                        {employee.jobInfo.pastProjects.map((proj, idx) => (
+                                            <li key={idx}>
+                                                <p><strong>Name:</strong> {proj.name}</p>
+                                                <p><strong>Description:</strong> {proj.description}</p>
+                                                <p><strong>Technologies:</strong> {proj.technologies?.join(", ")}</p>
+                                                <p><strong>projectStartDate:</strong> {proj.projectStartDate}</p>
+                                                <p><strong>projectEndDate:</strong> {proj.projectStartDate}</p>
+                                                <p><strong>Company:</strong> {proj.company}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No past projects added</p>
+                                )}
+                            </div>
 
-                            </TabsContent>
-                            <TabsContent value="system" className="text-grey-700">
-                                <p className='py-2'><strong>User Id: </strong>{employee.systemInfo.userId}</p>
-                                <p className='py-2'><strong>Role: </strong>{employee.systemInfo.role}</p>
-                                <p className='py-2'><strong>Created At: </strong>{employee.systemInfo.createdAt}</p>
-                                <p className='py-2'><strong>Created By: </strong>{employee.systemInfo.updatedBy}</p>
-                            </TabsContent>
-                          
+                        </TabsContent>
+                        <TabsContent value="projects" className="text-grey-700">
+                            {
+                                employee.currentProjects?.length > 0 ? (
+                                    <ul className="list-disc pl-4">
+                                        {employee.currentProjects.map((p, i) => (
+                                            <li key={i}>
+                                                {p.role} ({new Date(p.assignedDate).toLocaleDateString()} → Present)
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No current projects</p>
+                                )
+                            }
+
+                        </TabsContent>
+                        <TabsContent value="system" className="text-grey-700">
+                            <p className='py-2'><strong>User Id: </strong>{employee.systemInfo.userId}</p>
+                            <p className='py-2'><strong>Role: </strong>{employee.systemInfo.role}</p>
+                            <p className='py-2'><strong>Created At: </strong>{employee.systemInfo.createdAt}</p>
+                            <p className='py-2'><strong>Created By: </strong>{employee.systemInfo.updatedBy}</p>
+                        </TabsContent>
+
                     </Tabs>
 
 

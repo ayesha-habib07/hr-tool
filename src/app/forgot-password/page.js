@@ -4,25 +4,31 @@ import { Blend } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
+    const [message, setMessage] = useState('');
 
-    const handleSubmit =async(e)=>{
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        try{
-            const res= await fetch('/api/auth/forgot-password',{
-                method:'POST',
+        try {
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
                 headers: { "Content-Type": "application/json" },
-                body:JSON.stringify({email}),
+                body: JSON.stringify({ email }),
             });
             const data = await res.json();
-            if(!res.ok){
+            if (!res.ok) {
                 throw new Error(data.message);
                 console.error('error while setting new password');
                 return;
             }
-            
-            setEmail('');
-        }catch(err){
+
+            if (res.ok) {
+                setEmail('');
+                setMessage({ text: "Password updated successfully!", type: "success" });
+            }
+        } catch (err) {
             console.error('failed set forget password', err);
+            setMessage({ text: "Server error", type: "error" });
         }
     }
     return (
@@ -62,7 +68,7 @@ export default function ForgotPasswordPage() {
                             Email Address / Username
                         </label>
                     </div>
-                   
+
                     <button
                         type="submit"
                         className="bg-secondary-dark800 hover:bg-secondary-dark600 text-white py-2 rounded cursor-pointer"

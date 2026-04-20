@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
 
-import { connectDB } from "../../../../lib/connectDB";
+import { connectMongoose } from "../../../../lib/connectdb";
 import Projects from "../../../../models/Projects";
 
 export async function GET(req, { params }) {
     try {
-        await connectDB();
+        await connectMongoose();
         const { id } = params;
         const project = await Projects.findById(id);
 
@@ -23,7 +23,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
     try {
-        await connectDB();
+        await connectMongoose();
         const { id } = params;
         const body = await req.json();
 
@@ -45,7 +45,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
     try {
-        await connectDB();
+        await connectMongoose();
         const { id } = params;
         const deleted = await Projects.findByIdAndDelete(id);
 

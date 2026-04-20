@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const employeeSchema = new mongoose.Schema({
   employeeId: { type: String },
+  
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 
   personalInfo: {
     firstName: { type: String },
@@ -25,7 +31,9 @@ const employeeSchema = new mongoose.Schema({
         company: { type: String },
         role: { type: String },
         dateOfJoining: { type: String },
-        dateOfLeaving:{ type: String },
+        dateOfLeaving: { type: String },
+        yearsOfExperience:{type:String},
+        expertiseLevel:{type:String},
       },
     ],
 
@@ -51,13 +59,23 @@ const employeeSchema = new mongoose.Schema({
 
   systemInfo: {
     userId: { type: String },
-    role: { type: String },
+    orgId: { type: String },
+    role: { type: String, default: "system" },
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date },
     updatedBy: { type: String },
   },
+   // ✅ Add these for AI vector search
+  embeddingText: { type: String },
+  embedding: { type: [Number] }, 
 });
 
 const Employee = mongoose.models.Employee || mongoose.model("Employee", employeeSchema);
 
 export default Employee;
+
+
+// mongoose.models.Employee && delete mongoose.models.Employee;
+// const Employee = mongoose.model("Employee", employeeSchema);
+
+// export default Employee;

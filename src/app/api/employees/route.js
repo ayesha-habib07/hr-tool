@@ -1,35 +1,61 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../lib/connectDB";
 import Employee from '../../../models/Employee';
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import Department from "../../../models/Departments";
+import jwt from "jsonwebtoken";
+// import { connectDB } from "../../../lib/mongodb";
 
+import clientPromise from "@/src/lib/connectdb";
 import { checkAuthAndRole } from "../../../lib/auth";
+
+
+// import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import { connectDB } from "@/src/lib/mongoose";
+
+
+
+
 export async function GET(req) {
   try {
-    await connectDB();
+   await connectDB();
+    console.log("in employee get client connected");
+    //   const client = await clientPromise;
+    // console.log("connected mongoatlas")
+    // console.log("in employee  db connected", db);
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const search = searchParams.get("search") || "";
 
+    // Check user auth
+    const { user, error, status } = checkAuthAndRole(req, ["Admin", "User"]);
+    if (error) {
+      return NextResponse.json({ error }, { status });
+    }
+
+    // console.log("user from employee route", user);
+    const orgId = user.orgId || user.id;
     // Build search query
-    const query = search
-      ? {
-        $or: [
-          { "personalInfo.firstName": { $regex: search, $options: "i" } },
-          { "personalInfo.lastName": { $regex: search, $options: "i" } },
-          { "personalInfo.contactNumber": { $regex: search, $options: "i" } },
-          { "personalInfo.email": { $regex: search, $options: "i" } },
-          { "jobInfo.title": { $regex: search, $options: "i" } },
-          { "jobInfo.location": { $regex: search, $options: "i" } },
-          { "systemInfo.role": { $regex: search, $options: "i" } },
-          { "jobInfo.departmentId": { $regex: search, $options: "i" } },
-        ],
-      }
-      : {};
+    const query = {
+      "systemInfo.orgId": orgId, // restrict data to logged-in user's org
+    };
+
+    if (search) {
+      query.$or = [
+        { "personalInfo.firstName": { $regex: search, $options: "i" } },
+        { "personalInfo.lastName": { $regex: search, $options: "i" } },
+        { "personalInfo.contactNumber": { $regex: search, $options: "i" } },
+        { "personalInfo.email": { $regex: search, $options: "i" } },
+        { "jobInfo.title": { $regex: search, $options: "i" } },
+        { "jobInfo.location": { $regex: search, $options: "i" } },
+        { "systemInfo.role": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // console.log("🔍 Final query:", query);
 
     // Count total documents for pagination
     const total = await Employee.countDocuments(query);
@@ -91,11 +117,20 @@ export async function GET(req) {
   }
 }
 
+
+
 export async function POST(req) {
   try {
+    console.log("Employee post hittttt");
+
+    // const client = await clientPromise;
+    // const database = client.db(process.env.MONGODB_ATLAS_DB_NAME);
+    // const collection = database.collection("employees");
+    // console.log("in employee post clinet connected", client);
+
+
     await connectDB();
     const body = await req.json();
-    console.log("Incoming body:", body);
 
     // Hash password if provided
     let hashedPassword = null;
@@ -115,7 +150,7 @@ export async function POST(req) {
       );
     }
 
-    // Validate departmentId (required in schema)
+    // Validate departmentId
     if (
       !body.jobInfo?.departmentId ||
       !mongoose.Types.ObjectId.isValid(body.jobInfo.departmentId)
@@ -126,35 +161,33 @@ export async function POST(req) {
       );
     }
 
-    //  managerId is optional (only validate if provided)
+    // Validate optional managerId
     let managerId = null;
-    if (body.jobInfo?.managerId) {
-      if (mongoose.Types.ObjectId.isValid(body.jobInfo.managerId)) {
-        managerId = body.jobInfo.managerId;
-      } else {
-        console.warn(" Invalid managerId received, setting to null");
-      }
+    if (body.jobInfo?.managerId && mongoose.Types.ObjectId.isValid(body.jobInfo.managerId)) {
+      managerId = body.jobInfo.managerId;
     }
 
-    // Role check
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "No token found" }, { status: 401 });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Auth & Role check
     const { user, error, status } = checkAuthAndRole(req, ["Admin"]);
     if (error) {
       return NextResponse.json({ error }, { status });
     }
-    let data = body;
-    // sanitize empty strings to null
-    if (data.jobInfo) {
-      if (data.jobInfo.managerId === '') {
-        data.jobInfo.managerId = null;
-      }
+
+    // Sanitize data
+    if (body.jobInfo?.managerId === "") {
+      body.jobInfo.managerId = null;
     }
 
-
-// check this later
-    // jobInfo.departmentId = new mongoose.Types.ObjectId(body.jobInfo.departmentId);
-
-    // Create employee
+    // Create new employee
     const newEmployee = await Employee.create({
+      userId: user.id,
+      orgId: user.orgId || user.id,
       personalInfo: {
         firstName: body.personalInfo.firstName,
         lastName: body.personalInfo.lastName,
@@ -165,7 +198,7 @@ export async function POST(req) {
       jobInfo: {
         title: body.jobInfo?.title,
         departmentId: body.jobInfo.departmentId,
-        managerId: managerId, // optional now
+        managerId,
         employmentType: body.jobInfo?.employmentType,
         status: body.jobInfo?.status,
         dateOfJoining: body.jobInfo?.dateOfJoining,
@@ -177,21 +210,59 @@ export async function POST(req) {
       currentProjects: body.currentProjects || [],
       systemInfo: {
         userId: user.id,
+        orgId: user.orgId || user.id,
         role: user.role || "system",
         createdAt: new Date(),
         updatedAt: new Date(),
         updatedBy: user.id || "system",
+        userId: decoded.id,
+
       },
     });
 
+    const employee = newEmployee.toObject();
+    const text = `
+      ${employee.personalInfo.firstName} ${employee.personalInfo.lastName} 
+      works as ${employee.jobInfo.title}.
+      Department: ${employee.jobInfo.departmentId}.
+      Skills: ${(employee.jobInfo.skills || []).join(", ")}.
+      Summary: ${employee.jobInfo.pastProjects?.join(" | ")}
+    `;
+
+    // ✅ Generate embedding
+    const embeddings = new GoogleGenerativeAIEmbeddings({
+      model: "text-embedding-004",
+      apiKey: process.env.GOOGLE_API_KEY,
+    });
+
+    const vectors = await embeddings.embedDocuments([text]);
+    const vector = vectors[0];
+
+    await Employee.updateOne(
+      { _id: newEmployee._id },
+      {
+        $set: {
+          embeddingText: text,
+          embedding: vector,
+        },
+      }
+    );
+    console.log("vectorrrrrrr:", vector);
+    console.log("✅ Employee added + embedding created");
+
     return NextResponse.json(newEmployee, { status: 201 });
-  } catch (err) {
+  }
+  //   newEmployee.orgId = newEmployee._id;
+  //   await newEmployee.save();
+  //   await createEmployeeEmbedding(newEmployee);
+
+  //   return NextResponse.json(newEmployee, { status: 201 });
+  // }
+  catch (err) {
     console.error("POST /api/employees error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
-
 
 export async function PUT(req) {
   try {
@@ -246,7 +317,6 @@ export async function PUT(req) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
 
 
 export async function DELETE(req) {

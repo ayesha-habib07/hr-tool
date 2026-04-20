@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -35,12 +36,16 @@ export default function DashboardPage() {
   if (!user) return null;
   const roleName = user.role?.name || user.role;
   return (
-    <div className="rounded-lg p-6 text-secondary-dark800 bg-primary-light50 space-y-6">
-      <h2 className="text-2xl font-bold mb-6">
-        Welcome, {user.name} ({roleName})
-      </h2>
-      <table />
-    </div>
+    <>
+      <div className="relative min-h-screen">
+        {/* Main dashboard content */}
+        <div className="rounded-lg p-6 text-secondary-dark800 bg-primary-light50 space-y-6">
+          <h2 className="text-2xl font-bold mb-6">
+            Welcome, {user.name} ({roleName})
+          </h2>
+        </div>
+      </div>
+    </>
   );
 }
 

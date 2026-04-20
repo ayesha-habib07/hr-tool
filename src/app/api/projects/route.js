@@ -1,29 +1,33 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../lib/connectDB";
+import { connectDB } from "../../../lib/mongoose";
 import Project from "../../../models/Projects";
+import { checkAuthAndRole } from '../../../lib/auth'
 
 // ================= GET Projects with Pagination & Search =================
 export async function GET(req) {
   try {
     await connectDB();
+    const { user, error, status } = checkAuthAndRole(req, ["Admin", "User"]);
+    if (error) return NextResponse.json({ error }, { status });
 
-    // query params
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page")) || 1;
     const limit = parseInt(searchParams.get("limit")) || 10;
     const search = searchParams.get("search") || "";
+    const orgId = user.orgId || user.id;
 
-    const query = search
-      ? {
-          $or: [
-            { name: { $regex: search, $options: "i" } },
-            { client: { $regex: search, $options: "i" } },
-            { type: { $regex: search, $options: "i" } },
-            { status: { $regex: search, $options: "i" } },
-            { priority: { $regex: search, $options: "i" } },
-          ],
-        }
-      : {};
+
+    const query = { "systemInfo.orgId": orgId };
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { client: { $regex: search, $options: "i" } },
+        { type: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+        { priority: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const total = await Project.countDocuments(query);
     const projects = await Project.find(query)
@@ -40,18 +44,21 @@ export async function GET(req) {
       },
     });
   } catch (err) {
-    console.error(" Error fetching projects:", err);
+    console.error("❌ Error fetching projects:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
 
 // ================= POST Create Project =================
 export async function POST(req) {
   try {
     await connectDB();
+    const { user, error } = checkAuthAndRole(req, ['Admin']);
+    if (error) return NextResponse.json({ error });
 
     const body = await req.json();
-    console.log("Incoming project data:", body);
+    // console.log("Incoming project data:", body);
 
     const { name, description, client, type, startDate, endDate, status, priority, managerId } = body;
 
@@ -67,6 +74,7 @@ export async function POST(req) {
     const projectId = `PRJ${String(count + 1).padStart(3, "0")}`;
 
     const project = await Project.create({
+      userId: user.id,
       projectId,
       name,
       description,
@@ -79,6 +87,14 @@ export async function POST(req) {
       managerId,
       team: [],
       documents: [],
+      systemInfo: {
+        userId: user.id,
+        orgId: user.orgId || user.id,
+        role: user.role,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        updatedBy: user.id,
+      },
     });
 
     return NextResponse.json(project, { status: 201 });
@@ -92,6 +108,9 @@ export async function POST(req) {
 export async function DELETE(req) {
   try {
     await connectDB();
+    const { user, error, status } = checkAuthAndRole(req, ['Admin']);
+    if (error) return NextResponse.json({ error }, { status });
+
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -99,6 +118,11 @@ export async function DELETE(req) {
     if (!id) {
       return NextResponse.json({ error: "Project ID required" }, { status: 400 });
     }
+    // User can delete own org employees
+    const project = await Project.findByIdAndDelete({ _id: id, "systemInfo.orgId": user.orgId || user.id });
+
+    if (!project) return NextResponse.json({ error: 'Project not found or unauthorized' }, { status: 404 })
+
 
     await Project.findByIdAndDelete(id);
 

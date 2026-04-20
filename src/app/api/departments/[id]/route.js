@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../../lib/connectDB";
-import departments from '../../../../models/Departments';
+import { connectMongoose } from "../../../../lib/connectdb";
+import departments from '../../../../lib/Departments';
 
 export async function GET(req, { params }) {
     try {
-        await connectDB();
+        await connectMongoose();
         const { id } = params;
         const department = await departments.findById(id);
         if (!department) {
@@ -19,7 +19,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
     try {
-        await connectDB();
+        await connectMongoose();
         const { id } = params;
         const body = await req.json();
         const updatedDepartment = await departments.findByIdAndUpdate(id, body, {
@@ -36,7 +36,7 @@ export async function PUT(req, { params }) {
 }
 export async function DELETE(req, { params }) {
     try {
-        await connectDB();
+        await connectMongoose();
         const { id } = params;
         const deleted = await departments.findByIdAndDelete(id);
         if (!deleted) {

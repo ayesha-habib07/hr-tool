@@ -39,7 +39,7 @@ export default function ProjectList({ projects, search, setSearch, onChange }) {
         <TableCaption>A list of projects.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Project ID</TableHead>
+            {/* <TableHead>Project ID</TableHead> */}
             <TableHead>Name</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Project Type</TableHead>
@@ -54,7 +54,7 @@ export default function ProjectList({ projects, search, setSearch, onChange }) {
           {filteredProjects.length > 0 ? (
             filteredProjects.map((proj) => (
               <TableRow key={proj._id}>
-                <TableCell>{proj.projectId}</TableCell>
+                {/* <TableCell>{proj.projectId}</TableCell> */}
                 <TableCell>{proj.name}</TableCell>
                 <TableCell>{proj.client}</TableCell>
                 <TableCell>{proj.type}</TableCell>

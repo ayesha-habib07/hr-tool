@@ -203,22 +203,24 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                         <Select
                             name="type"
                             value={form.type}
-                            onChange={handleChange}
+                           onValueChange={(value) =>
+                                handleChange({ target: { name: "type", value } })
+                            }
                             className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
                         >
                             <SelectTrigger className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
-                                <SelectValue placeholder=' Project Type'>
+                                <SelectValue placeholder='Project Type'>
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='Internal' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     Internal
                                 </SelectItem>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='External' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     External
                                 </SelectItem>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
-                                    R&D
+                                <SelectItem value='Research' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Research
                                 </SelectItem>
                             </SelectContent>
 
@@ -229,7 +231,9 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                         <Select
                             name="status"
                             value={form.status}
-                            onChange={handleChange}
+                            onValueChange={(value) =>
+                                handleChange({ target: { name: "status", value } })
+                            }
                             className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
                         >
                             <SelectTrigger className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
@@ -237,16 +241,16 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
-                                    Planned
+                                <SelectItem value='Pending' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Pending
                                 </SelectItem>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='In Progress' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     In Progress
                                 </SelectItem>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='On Hold' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     On Hold
                                 </SelectItem>
-                                <SelectItem className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='Completed' className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     Completed
                                 </SelectItem>
                             </SelectContent>
@@ -293,9 +297,10 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                         <Select
                             name="priority"
                             value={form.priority}
-                            onChange={handleChange}
-
-                        >
+                            onValueChange={(value) =>
+                                handleChange({ target: { name: "priority", value } })
+                            }
+                            >
                             <SelectTrigger
                                 className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none"
                             >
@@ -303,17 +308,17 @@ export default function ProjectForm({ mode = "add", initialData = null, isEdit =
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='Low' className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     Low
                                 </SelectItem>
-                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='Medium' className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     Medium
                                 </SelectItem>
-                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                <SelectItem value='High' className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
                                     High
                                 </SelectItem>
-                                <SelectItem className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
-                                    Critical
+                                <SelectItem value='Urgent' className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800">
+                                    Urgent
                                 </SelectItem>
                             </SelectContent>
 

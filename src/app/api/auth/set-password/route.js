@@ -1,4 +1,4 @@
-import { connectDB } from "../../../../lib/connectDB";
+import { connectMongoose } from "../../../../lib/connectdb";
 import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    await connectDB();
+    await connectMongoose();
     const { token, password } = await req.json();
 
     // Verify invite token

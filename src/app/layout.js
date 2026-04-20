@@ -1,4 +1,5 @@
 import "./globals.css";
+import GlobalChat from "../components/GlobalChat";
 
 export const metadata = {
   title: "HR Tool",
@@ -6,10 +7,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return (        
+  return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        {children}
+      <body className="relative">
+       
+        <div className="min-h-screen">{children}</div>
+        <GlobalChat />
       </body>
     </html>
   );

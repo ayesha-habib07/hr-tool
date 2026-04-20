@@ -47,7 +47,7 @@ export default function CandidateDetail({ params }) {
         <>
             <div className=" bg-primary-light50 min-h-screen p-6 rounded-lg flex flex-col gap-4 ">
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h1 className='font-semibold text-xl text-grey-700'>Candiate Details</h1>
+                    <h1 className='font-semibold text-xl text-grey-700'>Candidate Details</h1>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className='text-grey-700 font-medium pl-6'>Candidate Name: {candidate.fullName}</h2>

@@ -67,7 +67,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       try {
         const res = await fetch("/api/departments");
         const data = await res.json();
-        setDepartments(data);
+        setDepartments(Array.isArray(data.departments) ? data.departments : []);
       } catch (err) {
         console.error("Failed to load departments:", err);
       }
@@ -262,7 +262,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       };
     });
     setEditIndex(-1);
-    setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" })
+    setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "", yearsOfExperience: "", expertiseLevel: "" });
   };
   // delete experience
   const deleteExperience = (i) => {
@@ -276,36 +276,71 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     // if we were editing this item, exit edit mode
     if (editIndex === index) {
       setEditIndex(-1);
-      setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
+      setEditExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "", yearsOfExperience: "", expertiseLevel: "" });
     }
   };
 
+  // const saveNewExperience = async () => {
+  //   // Basic validation example
+  //   if (!newExp.company && !newExp.role && !newExp.duration) {
+  //     alert("Please fill all fields");
+  //     return;
+  //   }
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     jobInfo: {
+  //       ...prev.jobInfo,
+  //       experiences: [
+  //         ...(prev.jobInfo?.experiences || []),
+  //         { ...newExp }
+  //       ]
+  //     }
+  //   }));
+
+  //   setIsAddingExperience(false);
+  //   setNewExp({ company: '', role: '', dateOfJoining: "", dateOfLeaving: "",yearsOfExperience:"",expertiseLevel:"" })
+  // };
+
   const saveNewExperience = async () => {
-    // Basic validation example
-    if (!newExp.company && !newExp.role && !newExp.duration) {
-      alert("Please fill all fields");
+    if (
+      !newExp.company ||
+      !newExp.role ||
+      !newExp.dateOfJoining ||
+      !newExp.dateOfLeaving ||
+      !newExp.expertiseLevel
+    ) {
+      alert("Please fill all required fields");
       return;
     }
+
+    const years = calculateExperience(newExp.dateOfJoining, newExp.dateOfLeaving);
+
     setFormData((prev) => ({
       ...prev,
       jobInfo: {
         ...prev.jobInfo,
         experiences: [
           ...(prev.jobInfo?.experiences || []),
-          { ...newExp }
-        ]
-      }
+          { ...newExp, yearsOfExperience: years },
+        ],
+      },
     }));
 
     setIsAddingExperience(false);
-    setNewExp({ company: '', role: '', dateOfJoining: "", dateOfLeaving: "" })
-
-
+    setNewExp({
+      company: "",
+      role: "",
+      dateOfJoining: "",
+      dateOfLeaving: "",
+      yearsOfExperience: "",
+      expertiseLevel: "",
+    });
   };
+
 
   const cancelAddExperience = () => {
     // reset and close
-    setNewExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "" });
+    setNewExp({ company: "", role: "", dateOfJoining: "", dateOfLeaving: "", yearsOfExperience: "", expertiseLevel: "" });
     setIsAddingExperience(false);
   };
 
@@ -388,6 +423,17 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
     setProjectEditData((p) => ({ ...p, technologies: p.technologies.filter((_, idx) => idx !== i) }));
   };
 
+  // to calculate experience sutomatically
+  function calculateExperience(joining, leaving) {
+    if (!joining || !leaving) return "";
+    const start = new Date(joining);
+    const end = new Date(leaving);
+    const diffYears = (end - start) / (1000 * 60 * 60 * 24 * 365);
+    return diffYears.toFixed(1);
+  }
+
+
+
 
   const handleChange = (section, field, value) => {
     setFormData((prev) => ({
@@ -427,6 +473,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           method: isEdit ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
+          credentials: "include",
         }
       );
       const data = await res.json();
@@ -471,7 +518,6 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           });
         }
       }
-
     }
 
     catch (error) {
@@ -500,7 +546,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
       {/* personal Information */}
       <div className="space-y-2">
         <h2 className="text-secondary-dark800 font-semibold">Personal Information</h2>
-       <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
               type="text"
@@ -667,31 +713,33 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
             <Select
               name="managerId"
               value={formData.jobInfo.managerId || ""}
-              onChange={(e) => handleChange("jobInfo", "managerId", e.target.value)}
-
+              onValueChange={(value) => handleChange("jobInfo", "managerId", value)}
             >
               <SelectTrigger
                 className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none"
               >
-                <SelectValue placeholder='-- Select Manager --'> </SelectValue>
+                <SelectValue placeholder="-- Select Manager --" />
               </SelectTrigger>
-              <SelectContent>
 
+              <SelectContent>
                 {employees.map((emp) => (
-                  <SelectItem key={emp._id} value={emp._id}
-                    className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                  <SelectItem
+                    key={emp._id}
+                    value={emp._id}
+                    className="text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                   >
                     {emp.personalInfo?.firstName} {emp.personalInfo?.lastName} — {emp.departmentName}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
           </div>
 
           <div className="relative flex-1">
             <Select
               value={formData.jobInfo.employmentType}
-              onChange={(e) => handleChange("jobInfo", "employmentType", e.target.value)}
+              onValueChange={(value) => handleChange("jobInfo", "employmentType", value)}
             >
               <SelectTrigger
                 className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
@@ -700,11 +748,13 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
+                  value="Full time"
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   Full time
                 </SelectItem>
                 <SelectItem
+                  value="Part time"
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   Part time
@@ -719,7 +769,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           <div className="relative flex-1">
             <Select
               value={formData.jobInfo.status}
-              onChange={(e) => handleChange("jobInfo", "status", e.target.value)}
+              onValueChange={(value) => handleChange("jobInfo", "status", value)}
               className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
             >
               <SelectTrigger
@@ -728,16 +778,19 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
+                  value='Active'
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   Active
                 </SelectItem>
                 <SelectItem
+                  value='Inactive'
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   Inactive
                 </SelectItem>
                 <SelectItem
+                  value='On Leave'
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   On Leave
@@ -749,7 +802,7 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
           <div className="relative flex-1">
             <Select
               value={formData.jobInfo.location}
-              onChange={(e) => handleChange("jobInfo", "location", e.target.value)}
+              onValueChange={(value) => handleChange("jobInfo", "location", value)}
 
             >
               <SelectTrigger
@@ -760,16 +813,19 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
+                  value='On Site'
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   On Site
                 </SelectItem>
                 <SelectItem
+                  value='Remote'
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   Remote
                 </SelectItem>
                 <SelectItem
+                  value='Hybrid'
                   className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
                 >
                   Hybrid
@@ -854,8 +910,8 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                     </div>
                     <div className="text-sm"> {exp.dateOfStart}</div>
                     <div className="text-sm"> {exp.dateOfEnd}</div>
-
-
+                    <div className="text-sm"> {exp.yearsOfExperience}</div>
+                    <div className="text-sm"> {exp.expertiseLevel}</div>
                   </div>
 
                   <div className="flex gap-2">
@@ -863,11 +919,10 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                     <Dialog open={editIndex === i} onOpenChange={(open) => {
                       if (!open) {
                         setEditIndex(-1);
-                        setEditExp({ company: "", role: "", dateOfStart: "", dateOfEnd: "" });
+                        setEditExp({ company: "", role: "", dateOfStart: "", dateOfEnd: "", yearsOfExperience: "", expertiseLevel: "" });
                       }
                     }}>
                       <Button
-
                         className="bg-primary-dark600 hover:bg-primary-dark800 text-grey-50 cursor-pointer font-medium "
                         onClick={() => {
                           setEditIndex(i);
@@ -876,6 +931,8 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                             role: exp.role || "",
                             dateOfJoining: exp.dateOfJoining || "",
                             dateOfLeaving: exp.dateOfLeaving || "",
+                            expertiseLevel: exp.expertiseLevel || "",
+                            yearsOfExperience: exp.yearsOfExperience || "",
                           });
                         }}
                       >
@@ -1022,7 +1079,21 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                       id="dateOfJoining"
                       placeholder=""
                       value={newExp.dateOfJoining}
-                      onChange={(e) => setNewExp((p) => ({ ...p, dateOfJoining: e.target.value }))}
+                      onChange={(e) => {
+                        const date = e.target.value;
+                        setNewExp((p) => {
+                          const updated = { ...p, dateOfJoining: date };
+                          return {
+                            ...updated,
+                            yearsOfExperience: calculateExperience(
+                              updated.dateOfJoining,
+                              updated.dateOfLeaving
+                            ),
+                          };
+                        });
+                      }}
+
+                      // onChange={(e) => setNewExp((p) => ({ ...p, dateOfJoining: e.target.value }))}
                       className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                     />
                     <label htmlFor="duration" className="absolute left-3 top-1 text-gray-500 text-xs">
@@ -1035,12 +1106,86 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
                       id="dateOfLeaving"
                       placeholder=""
                       value={newExp.dateOfLeaving}
-                      onChange={(e) => setNewExp((p) => ({ ...p, dateOfLeaving: e.target.value }))}
+
+                      onChange={(e) => {
+                        const date = e.target.value;
+                        setNewExp((p) => {
+                          const updated = { ...p, dateOfLeaving: date };
+                          return {
+                            ...updated,
+                            yearsOfExperience: calculateExperience(
+                              updated.dateOfJoining,
+                              updated.dateOfLeaving
+                            ),
+                          };
+                        });
+                      }}
+
+                      // {/* onChange={(e) => setNewExp((p) => ({ ...p, dateOfLeaving: e.target.value }))} */}
                       className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
                     />
                     <label htmlFor="duration" className="absolute left-3 top-1 text-gray-500 text-xs">
                       Date of Leaving
                     </label>
+                  </div>
+                  {/* Auto-calculated Years of Experience */}
+                  <div className="relative">
+                    <input
+                      id='yearsOfExperience'
+                      placeholder=""
+                      value={newExp.yearsOfExperience || ''}
+                      readOnly
+                      className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+                    />
+                    <label
+                      htmlFor="yearsOfExperience"
+                      className="absolute left-3 top-1 text-gray-500 text-xs"
+                    >
+                      Years of Experience (auto-calculated)
+                    </label>
+                  </div>
+
+
+                  {/* expertise level */}
+                  <div className="relative flex-1">
+                    <Select
+                      value={newExp.expertiseLevel}
+                      onValueChange={(value) => setNewExp((p) => ({ ...p, expertiseLevel: value }))}
+                      className="peer w-full border-2 border-grey-500  rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none text-grey-700"
+                    >
+                      <SelectTrigger
+                        className="w-full border-2 border-grey-500 rounded px-3 pt-5 pb-6 h-auto min-h-[55px] text-grey-700 focus:border-primary-dark600 focus:ring-0 focus:outline-none">
+                        <SelectValue placeholder='-- Select Job Status --'></SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem
+                          value='Beginner'
+                          className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                        >
+                          Beginner
+                        </SelectItem>
+                        <SelectItem
+                          value='Intermediate'
+                          className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                        >
+                          Intermediate
+                        </SelectItem>
+                        <SelectItem
+                          value='Advanced'
+                          className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                        >
+                          Advanced
+                        </SelectItem>
+                        <SelectItem
+                          value='Expert'
+                          className=" text-grey-700 py-2 hover:bg-secondary-light50 hover:text-secondary-dark800"
+                        >
+                          Expert
+                        </SelectItem>
+                      </SelectContent>
+
+                    </Select>
+
                   </div>
 
                   <div className="flex gap-2">
@@ -1065,8 +1210,8 @@ export default function EmployeeForm({ mode = "add", initialData = null, isEdit 
 
                     {/* Option B: or use DialogClose (uncomment if you prefer) */}
                     {/* <DialogClose asChild>
-                <button type="button" className="bg-gray-300 px-3 py-1 rounded">Cancel</button>
-              </DialogClose> */}
+                          <button type="button" className="bg-gray-300 px-3 py-1 rounded">Cancel</button>
+                        </DialogClose> */}
                   </div>
                 </div>
               </DialogContent>

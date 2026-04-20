@@ -1,8 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Blend } from 'lucide-react';
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "", organizationName: "" });
@@ -12,12 +12,23 @@ export default function SignupPage() {
   const [roles, setRoles] = useState([]);
   const router = useRouter();
 
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [agree, setAgree] = useState('');
+  const [agreeError, setAgreeError] = useState();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!agree) {
+      setAgreeError('You must agree to the Terms & Conditions before signing up.');
+      return;
+    }
+    setAgreeError("");
+    setError('');
     setLoading(true);
     setMessage(null);
 
@@ -32,10 +43,12 @@ export default function SignupPage() {
       if (res.ok) {
         setMessage({ text: "Account created successfully!", type: "success" });
         setForm({ name: "", email: "", password: "", organizationName: "" });
-
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push(`/verify-otp?email=${encodeURIComponent(form.email)}`);
         }, 1000);
+        //         if (res.ok) {
+        //   router.push(`/verify?email=${encodeURIComponent(email)}`);
+        // }
       } else {
         setMessage({ text: data.error || "Something went wrong", type: "error" });
       }
@@ -45,6 +58,16 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.");
+    }
+    else {
+      setError('');
+    }
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary-light50 px-4">
       <div className="w-full max-w-lg bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl p-8">
@@ -104,21 +127,44 @@ export default function SignupPage() {
           </div>
 
           <div className="relative">
+            {/* Password Input */}
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={form.password}
-              onChange={handleChange}
+              onChange={
+                (e) => {
+                  handleChange(e)
+                  validatePassword(e.target.value);
+                }
+              }
               required
-              className="peer w-full border-2 border-grey-500 rounded px-3 pt-5 pb-2 focus:border-primary-dark600 focus:outline-none"
+              className={`peer w-full border-2 rounded px-3 pt-5 pb-2 pr-10 focus:outline-none 
+          ${error ? "border-red-500" : "border-gray-300 focus:border-primary-dark600"}
+        `}
               placeholder="••••••••"
             />
+
+            {/* Label */}
             <label
               htmlFor="password"
-              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600">
+              className="absolute left-3 top-1 text-gray-500 text-xs transition-colors peer-focus:text-primary-dark600"
+            >
               Password
             </label>
 
+            {/* Toggle Visibility Icon */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+
+              className="absolute right-3 top-3 text-gray-500 hover:text-primary-dark600"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+
+            {/* Error Message */}
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
 
           <div className="relative">
@@ -140,14 +186,18 @@ export default function SignupPage() {
             <input
               type="checkbox"
               id="remember"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
               className="h-4 w-4 accent-primary-main text-primary-main border-gray-300 rounded"
 
             />
             <p className="text-grey-900 font-medium">Agree with <span className="underline">Terms & Condition</span></p>
+            {agreeError && <p className="text-red-500 text-xs">{agreeError}</p>}
           </div>
           <button
             type="submit"
             disabled={loading}
+            //  disabled={!agree}
 
             className="w-full cursor-pointer bg-secondary-dark800 hover:bg-secondary-dark600 text-white py-2 px-4 rounded-xl font-semibold transition-all duration-300"
           >
