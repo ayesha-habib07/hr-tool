@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectMongoose } from "../../../../lib/connectDB";
+import { connectMongoose } from "../../../../lib/connectdb";
 import User from "../../../../models/User";
 import { sendOtpEmail } from "../../../../lib/mailer";
 // export async function POST(req) {

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import clientPromise from './lib/connectDB.js'
+import clientPromise from './lib/connectdb.js'
 async function testConnection() {
   try {
     console.log("uriii:", process.env.MONGO_URI);
