@@ -261,7 +261,7 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
-import clientPromise from "./connectdb.js";
+import clientPromise from "./connectDB.js";
 
 export async function getVectorStore() {
   try {

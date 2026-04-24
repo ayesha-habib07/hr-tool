@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectMongoose } from "../../../../lib/connectdb";
-import departments from '../../../../lib/Departments';
+import { connectMongoose } from "../../../../lib/connectDB";
+import departments from "../../../../models/Departments";
 
 export async function GET(req, { params }) {
     try {

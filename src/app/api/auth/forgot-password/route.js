@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectMongoose } from "../../../../lib/connectdb";
+import { connectMongoose } from "../../../../lib/connectDB";
 import User from "../../../../models/User";
 import crypto from "crypto";
 

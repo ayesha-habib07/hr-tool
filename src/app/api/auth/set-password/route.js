@@ -1,4 +1,4 @@
-import { connectMongoose } from "../../../../lib/connectdb";
+import { connectMongoose } from "../../../../lib/connectDB";
 import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

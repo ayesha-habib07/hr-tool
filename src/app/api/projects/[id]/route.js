@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 
-import { connectMongoose } from "../../../../lib/connectdb";
+import { connectMongoose } from "../../../../lib/connectDB";
 import Projects from "../../../../models/Projects";
 
 export async function GET(req, { params }) {

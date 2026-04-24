@@ -6,7 +6,7 @@ import Department from "../../../models/Departments";
 import jwt from "jsonwebtoken";
 // import { connectDB } from "../../../lib/mongodb";
 
-import clientPromise from "@/src/lib/connectdb";
+import clientPromise from "@/src/lib/connectDB";
 import { checkAuthAndRole } from "../../../lib/auth";
 
 

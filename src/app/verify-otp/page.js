@@ -43,13 +43,13 @@
 
 
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import OTPInput from "../../components/OTPInput";
 import { Blend } from 'lucide-react';
 import { useRouter } from "next/navigation";
 
-export default function VerifyPage() {
+function VerifyPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const email = searchParams.get("email");
@@ -209,5 +209,13 @@ export default function VerifyPage() {
 
 
         </>
+    );
+}
+
+export default function VerifyPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <VerifyPageContent />
+        </Suspense>
     );
 }
